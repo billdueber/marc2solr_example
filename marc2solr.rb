@@ -2,35 +2,28 @@ initialTime  = Time.new
 
 require 'rubygems'
 require 'marc4j4r'
-$: << '../marcspec/lib'
 require 'marcspec'
-$: << '../../threach/lib'
 require 'threach'
 require 'jruby_streaming_update_solr_server'
 require 'logger'
 require 'pp'
 
 ####################################################################################
+################     Get the arguments        ######################################
+
+marcfile = ARGV[0] # where the MARC file is
+baseDir =  ARGV[1] # The directory that contains index.rb, translation_maps/ and lib/
+
+
+####################################################################################
 ################################## CONFIG ##########################################
 ####################################################################################
-#### Local resource use ####
-
-workerThreads = 1  # use 0 to fall back to a regular 'each'
-sendToSolrThreads = 1
-solrdocQueueSize = 64
-
-#### Logging ####
-$LOG = Logger.new('marc2solr.log')
-$LOG.datetime_format = '%Y-%m-%d %H:%M:%S'
-$LOG.level = Logger::DEBUG # Logger::INFO
-logBatchSize = 1000
 
 ## DEBUGGING STUFF ###
 
 actuallySendToSolr = false # whether or not to communicate with solr
-ppMARC = true # So you can compare to the doc
-ppDoc  = true # the doc as it would be sent to solr
-
+ppMARC = false # Pretty print the MARC, so you can compare to the doc
+ppDoc  = true  # Pretty print the doc as it would be sent to solr
 
 #### Solr config ####
 
@@ -45,6 +38,30 @@ clearSolrOut = false # CAREFUL!
 
 commitAtEnd = true
 
+
+#### Index, translation maps, and directory for extra code (ruby and/or .jars) ####
+
+# Derive the rest
+loadAllFilesIn = ["#{baseDir}/lib"] # for custom code
+specfile = "#{baseDir}/index.rb"
+translationMapsDir = "#{baseDir}/translation_maps"
+
+
+
+#### Local resource use ####
+
+workerThreads = 1  # use 0 to fall back to a regular 'each'
+sendToSolrThreads = 1
+solrdocQueueSize = 64
+
+#### Logging ####
+$LOG = Logger.new('marc2solr.log')
+$LOG.datetime_format = '%Y-%m-%d %H:%M:%S'
+# $LOG.level = Logger::DEBUG
+$LOG.level = Logger::INFO 
+logBatchSize = 1000
+
+
 #### Input file characteristics ####
 
 #readerType = :strictmarc 
@@ -56,15 +73,6 @@ defaultEncoding = nil # let it guess
 # defaultEncoding = :marc8
 # defaultEncoding = :iso   # ISO-8859-1
 
-
-#### Directory for extra code (ruby and/or .jars) ####
-
-loadAllFilesIn = ['simple_sample/lib'] # for custom code
-
-#### Field / mapping configuration ####
-
-specfile = 'simple_sample/simple_index.rb'
-translationMapsDir = 'simple_sample/translation_maps'
 
 
 
@@ -87,7 +95,6 @@ unless File.readable? specfile
 end
 $LOG.debug "Spec file exists"
 
-marcfile = ARGV[0]
 unless File.readable? marcfile
   raise ArgumentError, "MARC File '#{marcfile}' not readable"
 end
@@ -176,8 +183,8 @@ prevTime = loopStartTime
 i = 0 # Seed it so it'll exist after the loop exits
 $LOG.debug "Starting the loop"
 
-reader.threach(workerThreads, :each_with_index) do |r, i|
-
+# reader.threach(workerThreads, :each_with_index) do |r, i|
+reader.each_with_index do |r, i|
   doc = ss.doc_from_marc(r)
   # If you've got super-custom routines (that don't get put in your index file),
   # this is the spot for them.

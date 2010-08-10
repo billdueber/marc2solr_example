@@ -2,16 +2,42 @@ require 'rubygems'
 require 'logger'
 require 'marc4j4r'
 require 'pp'
-$: << 'lib'
 require 'marcspec'
-
+require 'fileutils'
 
 $LOG = Logger.new(STDOUT)
-$LOG.level = Logger::DEBUG
+$LOG.level = Logger::WARN
 
 # We'll take two arguments: a .properties index file, and a new directory 
 propfile = ARGV[0]
 newdir = ARGV[1]
+
+
+# First, try to create the new directory structure
+libdir = File.dirname(__FILE__).split('/')[0..-2]
+if libdir.size == 0
+  libdir = 'lib'
+else
+  libdir = libdir.join('/') + '/lib'
+end
+
+Dir.glob("#{libdir}/*") do |f|
+  require f
+end
+
+begin
+  FileUtils.mkdir_p "#{newdir}/translation_maps"
+  FileUtils.mkdir "#{newdir}/lib"
+  Dir.glob("#{libdir}/*").each do |f|
+    FileUtils.cp f, "#{newdir}/lib/"
+  end
+rescue Exception => e
+  $LOG.debug e
+end
+
+# Fix the log so it points to the logfile
+$LOG = Logger.new("#{newdir}/fromsolrmarc.log")
+$LOG.level = Logger::WARN
 
 unless File.exist? propfile
   $LOG.error "Can't find file '#{propfile}"
@@ -22,18 +48,11 @@ unless File.readable? propfile
   exit
 end
 
-# First, try to create the new directory structure
-begin
-  FileUtils.mkdir_p "#{newdir}/translation_maps"
-  FileUtils.mkdir_p "#{newdir}/lib"
-rescue Exception => e
-  $LOG.debug e
-  # error means it's already there???
-end
 
 propfiledir = File.dirname(propfile)
 trmapdir = propfiledir + '/translation_maps'
-newpropfile = File.basename(propfile, '.properties') + '.rb'
+# newpropfile = File.basename(propfile, '.properties') + '.rb'
+newpropfile = 'index.rb'
 
 
 
@@ -71,11 +90,52 @@ File.open(propfile) do |fh|
     next if line =~ /^#/
     fieldname,spec = line.split(/\s*=\s*/)
     
-    # Deal with custom fields
-    if spec =~ /^custom/
-      $LOG.debug "Skipping custom line #{line}"
+    # Deal with built-in functions if we can
+    if spec == 'FullRecordAsXML'
+      csf = MARCSpec::CustomSolrSpec.new(:solrField=>fieldname,
+                                          :module => MARC2Solr::Custom,
+                                          :methodSymbol => :asXML)
+      ss << csf
       next
     end
+
+    if spec == 'FullRecordAsMARC'
+      csf = MARCSpec::CustomSolrSpec.new(:solrField=>fieldname,
+                                          :module => MARC2Solr::Custom,
+                                          :methodSymbol => :asMARC)
+      ss << csf
+      next
+    end
+    
+    if spec == 'DateOfPublication'
+      csf = MARCSpec::CustomSolrSpec.new(:solrField=>fieldname,
+                                          :module => MARC2Solr::Custom,
+                                          :methodSymbol => :getDate)
+      ss << csf
+      next
+    end
+      
+    
+    if spec =~ /^custom,\s*getAllSearchableFields\((\d+),\s*(\d+)\)/
+      low = $1
+      high = $2
+      csf = MARCSpec::CustomSolrSpec.new(:solrField=>fieldname,
+                                         :module => MARC2Solr::Custom,
+                                         :methodSymbol => :getAllSearchableFields,
+                                         :methodArgs => [low, high])
+      ss << csf
+      next
+    end
+    
+    # Log and ignore custom fields
+    if spec =~ /^custom/
+      $LOG.warn "Skipping custom line #{line}"
+      next
+    end
+    
+      
+      
+    
     
     sfs = MARCSpec::SolrFieldSpec.new(:solrField => fieldname)
     
@@ -105,7 +165,7 @@ File.open(propfile) do |fh|
         sfcodes = $2.split(//)
         sfs << MARCSpec::VariableFieldSpec.new(tag, sfcodes)
       else
-        $LOG.debug "Didn't recognize line '#{line}'"
+        $LOG.warn "Didn't recognize line '#{line}'"
       end
     end # marcfields.split
     
@@ -115,10 +175,14 @@ File.open(propfile) do |fh|
       when 'first'
         sfs.first = true
       else
-        mapname =  special.gsub(/.properties$/, '')
+        origmapname = special
+        mapname =  special.gsub(/.properties/, '')
         sfs.map = ss.map(mapname)
         if mapname.nil? 
-          $LOG.debug "Unrecognized map name '#{mapname}'"
+          $LOG.warn "Map problem in #{fieldname}: Unrecognized map name '#{mapname}' (specified as '#{origmapname}')"
+        end
+        if mapname =~ /\((.*)\)/
+          $LOG.warn "Map problem in #{fieldname}: Translator doesn't deal at all with property key prefixes ('#{$1}' in this case). Please break them into separate map files or complain to Bill."
         end
       end
     end

@@ -17,7 +17,7 @@
   # Then the map -- just a hash mapping strings onto either strings
   # or arrays of strings
   
-  :map = {
+  :map => {
     'ONE' => 'one',
     'TWO' => 'two',
     'THREE' => ['three', 'tres', 'drei']

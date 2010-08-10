@@ -1,0 +1,117 @@
+# marc2solr -- index MARC records in Solr via JRuby
+
+`marc2solr` is a package wrapping up functionality in a variety of other gems, designed to make getting data from [MARC21](http://en.wikipedia.org/wiki/MARC_standards) files into [Solr](http://lucene.apache.org/solr/) as painless as possible.
+
+`marc2solr` is based on [Solrmarc](), the excellent Java-based program that does the same thing. `marc2solr` is *not* a drop-in replacement for Solrmarc, but can do most of the same things.
+
+It relies on [jruby](http://jruby.org/) to pull it all together; this will not run under stock Ruby!
+
+## INSTALLATION
+
+### Get JRuby
+First, you need to download a copy of [JRuby](http://jruby.org/download), untar/gzip it, and make sure its `bin/` directory is in your path.
+
+Maybe something like this:
+
+    <Download jruby-bin-1.5.1.tar.gz>
+    cd ~/bin
+    tar xzf /path/to/jruby-bin-1.5.1.tar.gz
+    ln -s jruby-1.5.1/ jruby
+    cd jruby/bin
+    export PATH=`pwd`:$PATH
+
+
+### Get the marc2solr code
+
+    cd /where/you/want/it
+    git clone git://github.com/billdueber/marc2solr.git
+
+
+### Installed the required gems
+
+    jgem install marc4j4r jruby_streaming_update_solr_server marcspec threach
+  
+  
+### Translate your Solrmarc files (optional)
+
+If you have a Solrmarc installation, you can attempt an automated translation of the Solrmarc format files to `marc2solr` format. 
+
+We assume:
+
+*  There's a single index file (e.g. umich_index.properties)
+*  There's a single directory of translation maps called `translation_maps` "next to" the index file
+
+In this case, you can run
+    jruby bin/fromsolrmarc.rb /path/to/the/index.properties /my/new/dir
+  
+...e.g.
+
+    jruby bin/fromsolrmarc.rb /solr/umich/umich_index.properties ./umich
+  
+The results will be:
+
+* Creation of `/my/new/dir`
+* Translation, as much as possible, of `umich_index.properties` into `index.rb`
+* Translation of all the translation maps
+
+
+### Create your own index.rb and translation files (eventually)
+
+The format for these files is explained pretty well in the appropriate files 
+within `simple_sample`. Start there, and send any questions to me so I can improve the docs.
+
+
+### Create and/or use custom routines
+
+There are a small handful of custom routines in `lib/marc2solr_custom.rb` (basically, just the ones I was using), which is copied into the `lib/` directory when you run `fromsolrmarc.rb`, too. You can see how to apply them by looking at `simple_sample/index.rb` and how to write them by looking at `simiple_sample/lib/marc2solr_custom.rb`.
+
+Note that *all* files in the `targetdir/lib` directory that end in either `.rb` or `.jar` will be loaded; you can include both ruby code java code in this way. Just create your file and dump it in there.
+
+## Running to debug
+
+Right now, the configuration above and beyond what's in the index and translation maps is right in the `marc2solr.rb` file; this will have to change at some point.
+
+### Edit the marc2solr.rb file
+
+The top of the `marc2solr.rb` file is full of all sorts of configuration information -- where solr is, whether to commit at the end, etc. As shipped, it expects a binary MARC file with unspecified MARC encoding, and will 
+NOT send stuff to Solr -- just to STDOUT.
+
+### Run it and check it out
+
+Run
+
+    jruby marc2solr.rb /path/to/marcfile.mrc /dir/containing/index/ > out.txt
+
+...e.g.,
+
+    jruby marc2solr.rb /path/to/marcfile.dat ./simple_sample/ > out.txt
+
+Assuming you haven't changed anything in the config section of marc2solr, you should have two files: 
+
+*  A file called 'out.txt' that has text representations of what would have been sent to Solr
+*  A file called 'marc2solr.log' that has all the log info (you can crank this up by changing the log level to Logger::DEBUG)
+
+
+## Actually sending stuff to solr
+
+When you've tested your index.rb file and all your custom routines seem to be working ok,  you can actually send stuff to Solr. 
+
+Edit marc2solr.rb to do the following:
+
+*  Put the URL to your solr install (*not* all the way to the update handler; just to the solr installation itself -- the URL will likely end in 'solr')   
+* Set `javabin` to true if you've defined the binary update script in your `solrconfig.xml` file. It should look like this:
+
+      <requestHandler name="/update/javabin" 
+                    class="solr.BinaryUpdateRequestHandler" />
+
+The javabin handler isn't necessary, but it speeds things up.
+
+* Make sure to set actuallySendToSolr to 'true'
+
+## Speeding things up even more with threach
+
+It's possible to speed things up even more by using even more threads to do the marc->solrdocument translation process. By specifying multiple work threads in your configuration section and changing the main loop to use `threach` instead of `each` (just comment/uncomment out the appropriate lines) you can get a big speed increase. 
+
+`threach`, however, doesn't deal with thrown errors very well, so if you expect you'll have exceptions that aren't caught, you might end up with a silent deadlock and nothing to do but hit Ctrl-C.
+
+Having said all that, I use `threach` in production with no problems; just program defensively.
