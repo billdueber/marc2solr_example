@@ -20,6 +20,11 @@ module MARC2Solr
       return r.to_xml
     end
     
+    # Another for marc binary
+    def self.asMARC r, args=nil
+      return r.to_marc
+    end
+    
     # Here we get all the text from fields between (inclusive) the two tag strings in args;
     # 
     # @param [MARC4J4R::Record] r A MARC4J4R record
@@ -38,6 +43,8 @@ module MARC2Solr
     # How about one to sort out, say, the 035s? We'll make a generic routine
     # that looks for specified values in specified subfields of variable
     # fields, and then make sure they match before returning them.
+    #
+    # See the use of this in the simple_sample/simple_index.rb file for field 'oclc'
     #
     # @param [MARC4J4R::Record] r A MARC4J4R record
     # @param [String] tag A tag string (e.g., '035')
