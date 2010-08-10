@@ -4,6 +4,7 @@ require 'rubygems'
 require 'marc4j4r'
 $: << '../marcspec/lib'
 require 'marcspec'
+$: << '../../threach/lib'
 require 'threach'
 require 'jruby_streaming_update_solr_server'
 require 'logger'
@@ -12,14 +13,24 @@ require 'pp'
 ####################################################################################
 ################################## CONFIG ##########################################
 ####################################################################################
+#### Local resource use ####
 
-#### Just trying it out? Output as pretty strings instead ####
-actuallySendToSolr = false
+workerThreads = 1  # use 0 to fall back to a regular 'each'
+sendToSolrThreads = 1
+solrdocQueueSize = 64
 
 #### Logging ####
-$LOG = Logger.new(STDOUT)
-$LOG.level = Logger::WARN
-logBatchSize = 25000
+$LOG = Logger.new('marc2solr.log')
+$LOG.datetime_format = '%Y-%m-%d %H:%M:%S'
+$LOG.level = Logger::DEBUG # Logger::INFO
+logBatchSize = 1000
+
+## DEBUGGING STUFF ###
+
+actuallySendToSolr = false # whether or not to communicate with solr
+ppMARC = true # So you can compare to the doc
+ppDoc  = true # the doc as it would be sent to solr
+
 
 #### Solr config ####
 
@@ -36,9 +47,9 @@ commitAtEnd = true
 
 #### Input file characteristics ####
 
-readerType = :strictmarc 
-#readertype = :permissivemarc 
-#readertype = :marcxml
+#readerType = :strictmarc 
+readerType = :permissivemarc 
+#readerType = :marcxml
 
 defaultEncoding = nil # let it guess
 # defaultEncoding = :utf8
@@ -48,87 +59,84 @@ defaultEncoding = nil # let it guess
 
 #### Directory for extra code (ruby and/or .jars) ####
 
-loadAllFilesIn = ['umich_sample/lib'] # for custom code
+loadAllFilesIn = ['simple_sample/lib'] # for custom code
 
 #### Field / mapping configuration ####
 
-specfile = 'umich_sample/specs/umich_index.rb'
-translationMapsDir = 'umich_sample/translation_maps'
+specfile = 'simple_sample/simple_index.rb'
+translationMapsDir = 'simple_sample/translation_maps'
 
 
-#### Local resource use ####
-
-workerThreads = 1
-sendToSolrThreads = 1
-solrdocQueueSize = 64
 
 
 ####################################################################################
 ###############################END CONFIG ##########################################
 ####################################################################################
-puts "Loaded"
+
+
+
+####################################################################################
+####### Ignore everything in here ##################################################
+####################################################################################
+
 # Check to make sure we can get the specfile and the marc file
 
-$LOG.debug "Checking files"
+$LOG.info "Checking files"
 unless File.readable? specfile
   raise ArgumentError, "Specfile '#{specfile}' not readable"
 end
+$LOG.debug "Spec file exists"
 
-puts "Spec file ok"
 marcfile = ARGV[0]
 unless File.readable? marcfile
   raise ArgumentError, "MARC File '#{marcfile}' not readable"
 end
-puts "MARC file ok"
+$LOG.debug "MARC file exists"
 
 # Load up everything in the loadAllFilesIn directories
 loadAllFilesIn.uniq.compact.each do |dir|
   unless File.exist? dir
-    $LOG.warn "Skipping load directory '#{dir}': Not found"
+    $LOG.info "Skipping load directory '#{dir}': Not found"
   end
-  puts "Loading files in #{dir}"
+  $LOG.info "Loading files in #{dir}"
   Dir.glob(["#{dir}/*.rb", "#{dir}/*.jar"]).each do |x|
-    puts "Loading #{x}"
+    $LOG.debug "Loading #{x}"
     require x
   end
 end
 
 # Create a specset
 
-puts "Create ss"
 ss = MARCSpec::SpecSet.new
 
-# Load up the tmaps and the specfile
-unless File.exist? translationMapsDir 
-  $LOG.error "Can't find directory #{translationMapsDir}; aborting"
-  exit
-end
+ss.loadMapsFromDir translationMapsDir
 
-puts "Found tmaps dir"
 
-Dir.glob("#{translationMapsDir}/*").each do |tmap|
-  puts "Adding #{tmap}"
-  ss.add_map(MARCSpec::Map.fromFile(tmap))
-end
 
-# Get the list of specs and load them up
+# Get the list of specs and load them up. We differentiate a custom routine
+# because it has a :module defined
+
 speclist = eval(File.open(specfile).read)
-speclist.each do |spec|
-  solrspec = MARCSpec::SolrFieldSpec.fromHash(spec)
-  if spec[:mapname]
-    map = ss.map(spec[:mapname])
+speclist.each do |spechash|
+  if spechash[:module]
+    solrspec = MARCSpec::CustomSolrSpec.fromHash(spechash)
+  else
+    solrspec = MARCSpec::SolrFieldSpec.fromHash(spechash)
+  end
+  if spechash[:mapname]
+    map = ss.map(spechash[:mapname])
     unless map
-      puts "  Cannot find map #{spec[:mapname]} for field #{spec[:solrField]}"
+      $LOG.error "  Cannot find map #{spechash[:mapname]} for field #{spechash[:solrField]}"
     else
-      puts "  Found map #{spec[:mapname]} for field #{spec[:solrField]}"
+      $LOG.debug "  Found map #{spechash[:mapname]} for field #{spechash[:solrField]}"
       solrspec.map = map
     end
   end
   ss.add_spec solrspec
-  puts "Added spec #{solrspec.solrField}"
+  $LOG.debug "Added spec #{solrspec.solrField}"
 end
 
-puts "Added #{ss.solrfieldspecs.size} specs"
+$LOG.info "Added #{ss.solrfieldspecs.size} specs"
 
 # Create the SUSS
 
@@ -137,84 +145,77 @@ if actuallySendToSolr
   if javabin
     suss.setRequestWriter Java::org.apache.solr.client.solrj.impl.BinaryRequestWriter.new
   end
+  $LOG.info "Got the suss"
 end
 
-puts "Got the suss (if requested)"
 # Get the reader
 
 reader = MARC4J4R::Reader.new(marcfile, readerType, defaultEncoding)
 
-puts "Got the reader"
+$LOG.info "Got the reader"
 ## Clear things out if requested, and it's not a dry run
 
 if clearSolrOut and actuallySendToSolr
   suss.deleteByQuery('*:*')
   suss.commit
-  $LOG.debug "Cleaned out Solr"
+  $LOG.info "Cleaned out Solr"
 end
 
-puts "Cleaned out (if requested)"
 
 # Actually do the work
 loopStartTime = Time.new
 prevTime = loopStartTime
 
-$LOG.debug "Starting the loop at #{loopStartTime}"
+
+
+####################################################################################
+####### OK, start paying attention again############################################
+####################################################################################
+
 
 i = 0 # Seed it so it'll exist after the loop exits
+$LOG.debug "Starting the loop"
+
 reader.threach(workerThreads, :each_with_index) do |r, i|
-  puts "Loaded a record: #{r['245']}"
+
   doc = ss.doc_from_marc(r)
-  
-  puts r
-  puts doc
-  next
-  
-  # We should be able to do custom routines via configuration pretty easily. For now,
-  # stick them here. MARC2Solr::UMich is loaded from the lib directory automatically,
-  # and everything is set up as module functions. This will allow us to configure
-  # (eventually) like
-  #  [:custom, MARC2Solr::UMich, :getAllSearchableFields, ['100', '999'], nil]
-  #  [:custom, MARC2Solr::UMich, :getLanguage, nil, 'language_map']
-  
-  puts "Starting custom fields"
-  doc['allfields']   = MARC2Solr::UMich.getAllSearchableFields(r, '100', '999')
-  doc['language']    = MARC2Solr::UMich.getLanguage(r, ss.map('language_map'))
-  doc['title']       = MARC2Solr::UMich.getTitle(r, %w(a b d e f g h k n p))
-  doc['titleSort']   = MARC2Solr::UMich.getTitle_sort(r)
-  doc['publishDate'] =  MARC2Solr::UMich.getDate(r)
-  
-  doc['fullrecord'] = r.to_xml
-  
-  if actuallySendToSolr
-    suss << doc
-    puts "Sent to solr"
-  else
-    pp doc
-    pp "---------------\n"
-  end
-  
-  if (i % logBatchSize)
+  # If you've got super-custom routines (that don't get put in your index file),
+  # this is the spot for them.
+  #
+  # Do either
+  #   doc[fieldname] = value_or_array_of_values
+  # or
+  #   doc.merge! hash_of_fieldname_value_pairs
+
+
+  # Send it to solr
+  suss << doc if actuallySendToSolr
+
+  # ...and/or STDOUT
+  puts r if ppMARC
+  puts doc if ppDoc
+  puts "\n--------------------------\n" if ppMARC or ppDoc
+
+  # Throw a log line if it's time
+  if (i % logBatchSize == 0)
     curtime = Time.new
-    print ('%6d' % i) + "\t" +  Time.new.to_s 
-    print (' %6d %6.0f' % [count, (curtime.to_f - prevtime.to_f)]) + "\t" + "seconds, " 
-    puts ('%4.0f' % (count / (curtime.to_f - initialTime.to_f))) + ' r/s pace overall'
-    prevtime = curtime
+    secs  = '%.0f' % (curtime.to_f - prevTime.to_f)
+    pace  = '%.0f' % (i / (curtime.to_f - initialTime.to_f))
+    $LOG.info "#{i} #{secs}s this batch, (#{pace}r/s so far)"
+    prevTime = curtime
   end
-  
 end
 
-
 # Final commit
-$LOG.debug "Final commit"
+$LOG.info "Final commit"
 suss.commit if commitAtEnd and actuallySendToSolr
 
-$LOG.debug "Finished"
-puts "Done. Waiting for HTTP Reader to time out or whatever it does"
+finalTime = Time.new
+$LOG.info "Finished"
+$LOG.info "Done. Waiting for HTTP Reader to time out or whatever it does"
 
-puts "\n\nStarted at:  " + initialTime.to_s
-puts "Finished at: " + finalTime.to_s
+$LOG.info "Started at:  " + initialTime.to_s
+$LOG.info "Finished at: " + finalTime.to_s
 
-puts "\nTotal of #{i} records"
-puts ('%6.0f' % (finalTime.to_f - initialTime.to_f)) + "\t" + "seconds for the whole batch of #{i}\n"
-puts "      \t" + ('%4.0f' % (count / (finalTime.to_f - initialtime.to_f))) + ' records/s pace for the whole thing'
+$LOG.info "Total of #{i} records in " + '%.0f' % (finalTime.to_f - initialTime.to_f) + " seconds"
+$LOG.info '%.0f' % (i / (finalTime.to_f - initialTime.to_f)) + ' records/sec pace for the whole thing'
