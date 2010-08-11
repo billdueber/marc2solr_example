@@ -12,6 +12,14 @@ It relies on [jruby](http://jruby.org/) to pull it all together; this will not r
 * I've not yet figured out how to deal with logging done by the java code. At this point, it just spams STDOUT. I'm sure it's solvable, I just haven't solved it yet.
 
 
+## How is this different than solrmarc?
+
+* It's JRuby, not java (although you can use java code in JRuby if you'd like)
+* It talks to solr via http, not by directly munging the lucene indexes.
+* With a single thread, it'll likely be slower. If you ramp it up with `threach`, it'll likely be faster
+* Values in translation maps can be arrays of values, not just scalars
+* It doesn't have the range of custom functions solrmarc does of yet
+
 ## INSTALLATION
 
 ### Get JRuby
@@ -126,7 +134,7 @@ The javabin handler isn't necessary, but it speeds things up.
 * Make sure to set actuallySendToSolr to 'true'
 * Decide whether or not to set `cleanOutSolr`; if true, the target Solr install will be completely emptied before indexing begins.
 
-The logfile will again show you what's 
+The logfile will again show you what's going on, including rough speeds.
 
 ## Speeding things up even more with threach
 
