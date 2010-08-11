@@ -15,11 +15,18 @@ It relies on [jruby](http://jruby.org/) to pull it all together; this will not r
 ## How is this different than solrmarc?
 
 * It's JRuby, not java (although you can use java code in JRuby if you'd like)
-* It talks to solr via http, not by directly munging the lucene indexes.
-* With a single thread, it'll likely be slower. If you ramp it up with `threach`, it'll likely be faster
+* It talks to solr via http, not by directly munging the lucene indexes. This allows you to do things like run updates against a live index if you'd like, or run the indexing code on a separate machine than your solr install.
+* With a single thread, it'll likely be a little slower. If you ramp it up with `threach`, it'll likely be a little faster (I'd *love* to hear from people about this).
 * Values in translation maps can be arrays of values, not just scalars
-* It doesn't have the range of custom functions solrmarc does of yet
+* It doesn't have the range of custom functions solrmarc does as of yet, but collectively building up a library of these should be easy if folks start using it.
 * Configuration is just Ruby files, so you could (in theory) do fancy stuff in there
+
+## What's under the hood?
+
+* [jruby_streaming_update_solr_server](), a jruby wrapper around [org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer](http://lucene.apache.org/solr/api/org/apache/solr/client/solrj/impl/StreamingUpdateSolrServer.html). This provides both the connection to solr (via StreamingUpdateSolrServer) and the ability to build a solr document in a ruby-ish way (via SolrInputDocument)
+* [marc4j4r](http://github.com/billdueber/javamarc/tree/master/ruby/marc4j4r/), ruby wrappers around the incredible `marc4j.jar` java library. In this case, the code is based on my fork, which I'm calling [javamarc](http://github.org/billdueber/javamarc) to avoid confusion with Blas Peters' original.
+* [marcspec](http://github.org/billdueber/marcspec), a set of classes that allow one to easily pull bits of data out of MARC records (using the above)
+* [threach](http://github.com/billdueber/threach), a simple "threaded each" that, despite its limitations, can be useful for easily speeding things up by throwing more cores at it.
 
 ## INSTALLATION
 
