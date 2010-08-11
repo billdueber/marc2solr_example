@@ -107,17 +107,17 @@ NOT send stuff to Solr -- just to STDOUT.
 
 ### Run it in debug mode and check out the results
 
-The top of the `marc2Solr.rb` file has three configuration variables to dictate what to do in terms of actually sending stuff to Solr and spitting debug info out to STDOUT. It can be useful at times to push out both the MARC record and what it gets turned into for debugging purposes. 
+`marc2Solr.rb` has three configuration variables (`actuallySendToSolr`, `ppMARC`, and `ppDoc`) to dictate what to do in terms of actually sending stuff to Solr and spitting debug info out to STDOUT. It can be useful at times to push out both the MARC record and what it gets turned into for debugging purposes. 
 
 None of those options are mutually exclusive; you can push to Solr and STDOUT at the same time.
 
-In any case, go ahead and run
+In any case, assuming you haven't messed with anything, go ahead and run
 
-    jruby marc2Solr.rb /path/to/marcfile.mrc /dir/containing/index/ > out.txt
+    jruby marc2Solr.rb /path/to/marcfile.mrc /dir/containing/index > out.txt
 
 ...e.g.,
 
-    jruby marc2Solr.rb /path/to/mymarcfilie.mrc ./simple_sample/ > out.txt
+    jruby marc2Solr.rb /path/to/mymarcfilie.mrc ./simple_sample > out.txt
 
 Assuming you haven't changed anything in the config section of marc2Solr, you should have two files: 
 
