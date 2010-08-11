@@ -19,6 +19,7 @@ It relies on [jruby](http://jruby.org/) to pull it all together; this will not r
 * With a single thread, it'll likely be slower. If you ramp it up with `threach`, it'll likely be faster
 * Values in translation maps can be arrays of values, not just scalars
 * It doesn't have the range of custom functions solrmarc does of yet
+* Configuration is just Ruby files, so you could (in theory) do fancy stuff in there
 
 ## INSTALLATION
 
@@ -84,7 +85,7 @@ within `simple_sample`. Start there, and send any questions to me so I can impro
 
 There are a small handful of custom routines in `lib/marc2solr_custom.rb` (basically, just the ones I was using), which is copied into the `lib/` directory when you run `fromsolrmarc.rb`, too. You can see how to apply them by looking at `simple_sample/index.rb` and how to write them by looking at `simiple_sample/lib/marc2solr_custom.rb`.
 
-To create your own custom functions, create a module 
+To create your own custom functions, create a module and provide module-level function (again, see the example file in `lib/`). A custom routine specification just gives the module, method name (as a symbol), and optional arguments to pass besides the MARC4J4R::Record object. 
 
 Note that *all* files in the `targetdir/lib` directory that end in either `.rb` or `.jar` will be loaded; you can include both ruby code java code in this way. Just create your file and dump it in there.
 
