@@ -1,10 +1,9 @@
 initialTime  = Time.new
 
 require 'rubygems'
-require 'marc4j4r'
-require 'marcspec'
-require 'threach'
-require 'jruby_streaming_update_solr_server'
+require 'bundler'
+Bundler.setup
+Bundler.require(:default)
 require 'logger'
 require 'pp'
 
@@ -13,6 +12,11 @@ require 'pp'
 
 marcfile = ARGV[0] # where the MARC file is
 baseDir =  ARGV[1] # The directory that contains index.rb, translation_maps/ and lib/
+
+unless marcfile =~ /\S/ and baseDir =~ /\S/
+  puts "Need both a marcfile and a directory"
+  exit
+end
 
 
 ####################################################################################
@@ -24,10 +28,11 @@ baseDir =  ARGV[1] # The directory that contains index.rb, translation_maps/ and
 actuallySendToSolr = false # whether or not to communicate with solr
 ppMARC = false # Pretty print the MARC, so you can compare to the doc
 ppDoc  = true  # Pretty print the doc as it would be sent to solr
+useThreach = false
 
 #### Solr config ####
 
-solrURL = 'http://localhost:8888/biblio/solr'
+solrURL = 'http://mojito.umdl.umich.edu:8024/solr/biblio/'
 javabin = true; # true only if /update/javabin is defined in solrconfig.xml
 
 # Clear solr out first (obviously very dangerous!)
@@ -50,17 +55,21 @@ translationMapsDir = "#{baseDir}/translation_maps"
 
 #### Local resource use ####
 
-workerThreads = 1  # use 0 to fall back to a regular 'each'
+workerThreads = 2  
 sendToSolrThreads = 1
 solrdocQueueSize = 64
 
 #### Logging ####
-$LOG = Logger.new('marc2solr.log')
-$LOG.datetime_format = '%Y-%m-%d %H:%M:%S'
+
+logfilename = File.basename(marcfile).split(/\./)[0] + '-' + Time.new.strftime('%Y%m%d-%H%M%S') + '.log'
+$LOG = Logger.new(logfilename)
+$LOG.datetime_format = '%Y%m%d %H:%M:%S'
 # $LOG.level = Logger::DEBUG
 $LOG.level = Logger::INFO 
 logBatchSize = 1000
 
+$stderr.sync = true
+$stderr.puts "Processing #{marcfile}\n Logfile is #{logfilename}"
 
 #### Input file characteristics ####
 
@@ -148,7 +157,7 @@ $LOG.info "Added #{ss.solrfieldspecs.size} specs"
 # Create the SUSS
 
 if actuallySendToSolr
-  suss = StreamingUpdateSolrServer.new(solrurl,solrdocQueueSize,sendToSolrThreads)
+  suss = StreamingUpdateSolrServer.new(solrURL,solrdocQueueSize,sendToSolrThreads)
   if javabin
     suss.setRequestWriter Java::org.apache.solr.client.solrj.impl.BinaryRequestWriter.new
   end
@@ -183,8 +192,17 @@ prevTime = loopStartTime
 i = 0 # Seed it so it'll exist after the loop exits
 $LOG.debug "Starting the loop"
 
+if useThreach
+  method = :threach
+  args = [workerThreads, :each_with_index]
+else
+  method = :each_with_index
+  args = []
+end
+
+reader.send(method, *args) do |r, i|
 # reader.threach(workerThreads, :each_with_index) do |r, i|
-reader.each_with_index do |r, i|
+# reader.each_with_index do |r, i|
   doc = ss.doc_from_marc(r)
   # If you've got super-custom routines (that don't get put in your index file),
   # this is the spot for them.
@@ -206,7 +224,7 @@ reader.each_with_index do |r, i|
   # Throw a log line if it's time
   if (i % logBatchSize == 0)
     curtime = Time.new
-    secs  = '%.0f' % (curtime.to_f - prevTime.to_f)
+    secs  = '%.1f' % (curtime.to_f - prevTime.to_f)
     pace  = '%.0f' % (i / (curtime.to_f - initialTime.to_f))
     $LOG.info "#{i} #{secs}s this batch, (#{pace}r/s so far)"
     prevTime = curtime
@@ -214,8 +232,10 @@ reader.each_with_index do |r, i|
 end
 
 # Final commit
-$LOG.info "Final commit"
-suss.commit if commitAtEnd and actuallySendToSolr
+if commitAtEnd and actuallySendToSolr
+  suss.commit 
+  $LOG.info "Final commit"
+end
 
 finalTime = Time.new
 $LOG.info "Finished"
