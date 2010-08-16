@@ -6,6 +6,10 @@
 
 It relies on [jruby](http://jruby.org/) to pull it all together; this will not run under stock Ruby!
 
+## MAJOR CHANGES
+
+There was a major change in the way custom functions work between version 0.1 and 0.2 -- see the section "CHANGES" at the end of this file.
+
 ## Current problems
 
 * There are debugging issues with `threach` -- see the `threach` section, below
@@ -92,7 +96,36 @@ within `simple_sample`. Start there, and send any questions to me so I can impro
 
 There are a small handful of custom routines in `lib/marc2Solr_custom.rb` (basically, just the ones I was using), which is copied into the `lib/` directory when you run `fromSolrmarc.rb`, too. You can see how to apply them by looking at `simple_sample/index.rb` and how to write them by looking at `simiple_sample/lib/marc2Solr_custom.rb`.
 
-To create your own custom functions, create a module and provide module-level function (again, see the example file in `lib/`). A custom routine specification just gives the module, method name (as a symbol), and optional arguments to pass besides the MARC4J4R::Record object. 
+To create your own custom functions, create a module and provide module-level function (again, see the example file in `lib/`). A custom routine specification just gives the module, method name (as a symbol), and optional arguments to pass besides the mid-construction document (a hashlike) and the MARC4J4R::Record object. 
+
+A simple custom routine looks like this:
+
+    module MARC2Solr
+      module Custom
+        module WhatzamattaU
+          def self.doSomethingCustom(doc, record, myarg, myotherarg)
+            previouslyComputedValues = doc['someField']
+            vals = []
+            if previousComptedValues.include? myarg
+              vals << record['245']['a'] + myotherarg
+            end
+            return vals
+          end
+        end
+      end
+    end
+
+
+...and is called via a spec like this:
+
+    {
+      :solrField => myField,
+      :module => MARC2Solr::Custom::WhatzamattaU,
+      :methodSymbol => :doSomethingCustom,
+      :methodArgs => ['the first arg', 'the second arg']
+    }
+    
+You can see that the module function (note that it's defined via `self.functionName`) will always have at least two arguments (`doc` and `record`), plus whatever you need to have passed in to do the work. When the system makes the call, you grab what you need from the document and the record and return an array of values. 
 
 Note that *all* files in the `targetdir/lib` directory that end in either `.rb` or `.jar` will be loaded; you can include both ruby code java code in this way. Just create your file and dump it in there.
 
@@ -153,3 +186,10 @@ There are some issues with using `threach`:
 * The reported number of records indexed will almost certainly not match reality. Check your Solr admin panel for that. 
 
 Having said all that, I use `threach` in production with no problems; just program defensively.
+
+# CHANGES
+0.2
+:  Added VERSION file and this CHANGES section
+:  Update to use MARCSpec v0.4, which changes the signature of custom functions. Instead of` (record, your,args)`, it's now `(doc, record, your, args)`, where `doc` is a hashlike that contains the already-computed fields. This allows you access to stuff you've already done in subsequent field computations (e..g, use the results of the `format` fields to influence setting -- or not -- the `serialTitle` field).
+0.1
+:  First public release

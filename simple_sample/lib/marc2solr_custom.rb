@@ -13,25 +13,28 @@ module MARC2Solr
     # Note that even though we don't use the arguments, the method signature has to 
     # support it
     #
+    # @param [hashlike] doc The document object being added to; allows you to leverage already-done work
     # @param [MARC4J4R::Record] r A MARC4J4R record
+    # @param [#[]] doc A hashlike (responds to #[]) that holds the computed values for fields "so far"
     # @return [String] The XML representation of the record
 
-    def self.asXML r  #Remember, module fucntion! Define with "def self.methodName"
+    def self.asXML doc, r  #Remember, module fucntion! Define with "def self.methodName"
       return r.to_xml
     end
     
     # Another for marc binary
-    def self.asMARC r
+    def self.asMARC doc, r
       return r.to_marc
     end
     
     # Here we get all the text from fields between (inclusive) the two tag strings in args;
     # 
+    # @param [hashlike] doc The document object being added to; allows you to leverage already-done work
     # @param [MARC4J4R::Record] r A MARC4J4R record
     # @param [Array<String>] args An array of two strings, the lowest tag you want to include, and
     # the highest
     # @return [String] A single single string with all the text from included fields
-    def self.getAllSearchableFields(r, lower, upper)
+    def self.getAllSearchableFields(doc, r, lower, upper)
       data = []
       r.each do |field|
         next unless field.tag <= upper and field.tag >= lower
@@ -46,14 +49,15 @@ module MARC2Solr
     #
     # See the use of this in the simple_sample/simple_index.rb file for field 'oclc'
     #
+    # @param [hashlike] doc The document object being added to; allows you to leverage already-done work
     # @param [MARC4J4R::Record] r A MARC4J4R record
     # @param [String] tag A tag string (e.g., '035')
     # @param [String, Array<String>] codes A subfield code ('a') or array of them (['a', 'c'])
     # @param [Regexp] pattern A pattern that must match for the value to be included
     # @param [Fixnum] matchindex The number of the substring captured by parens in the pattern to return
     # The default is zero, which means "the whole string"
-    
-    def self.valsByPattern(r, tag, codes, pattern, matchindex=0)
+    # @return [Array<String>] a (possibly empty) array of found values
+    def self.valsByPattern(doc, r, tag, codes, pattern, matchindex=0)
       data = []
       r.find_by_tag(tag).each do |f|
         f.sub_values(codes).each do |v|
@@ -68,8 +72,11 @@ module MARC2Solr
     
     
     # An example of a DateOfPublication implementation
-    def self.getDate r
-      data = []
+    # @param [hashlike] doc The document object being added to; allows you to leverage already-done work
+    # @param [MARC4J4R::Record] r A MARC4J4R record
+    # @return [String] the found date, or nil if not found.
+    
+    def self.getDate doc, r
       begin
         ohoh8 = r['008'].value
         date1 = ohoh8[7..10].downcase
