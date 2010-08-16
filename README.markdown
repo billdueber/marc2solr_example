@@ -6,6 +6,10 @@
 
 It relies on [jruby](http://jruby.org/) to pull it all together; this will not run under stock Ruby!
 
+## VERSION
+
+0.2.0
+
 ## MAJOR CHANGES
 
 There was a major change in the way custom functions work between version 0.1 and 0.2 -- see the section "CHANGES" at the end of this file.
