@@ -10,6 +10,9 @@ It relies on [jruby](http://jruby.org/) to pull it all together; this will not r
 
 0.2.0
 
+Consider this a *beta* -- things are pretty settled down, but some parts of the interface (as represented by marcspec) may still change. Announcements of updates to this code and the libraries that underly it will be made at [my blog](http://robotlibrarian.billdueber.com/).
+
+
 ## MAJOR CHANGES
 
 There was a major change in the way custom functions work between version 0.1 and 0.2 -- see the section "CHANGES" at the end of this file.

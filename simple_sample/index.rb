@@ -159,11 +159,30 @@
     '035', # the tag
     'a',   # the subfield code or list of subfield codes
     /(?:oclc|ocolc|ocm|ocn).*?(\d+)/i, # the pattern to match
-    1 # the match index. In this case, we have one set of capturing parent ('?:' doesn't capture)
+    1 # the match index. In this case, we have one set of capturing parens ('?:' doesn't capture)
       # and we want what's in it -- the actual digits after the initial nonsense
   ]
 },  
 
+# It's also possible to repeat the same solrField. The result is that all the returned values from
+# all the specs are added as values (to what must obviously be a multiValued solr field).
+#
+# For example, We can add both the full 245 and the 245 minus any indexing chars to the single
+# 'title' field like so:
+
+{
+  :solrField => 'title',
+  :specs => [
+    ['245', '*', '*']
+  ] 
+},
+
+{
+  :solrField => 'title',
+  :module => MARC2Solr::Custom,
+  :methodSymbol => :fieldWithoutIndexingChars,
+  :methodArgs => ['245']
+},
 
   
 ] # don't forget to close off the array!

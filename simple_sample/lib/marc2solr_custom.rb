@@ -108,6 +108,18 @@ module MARC2Solr
       end
     end    
     
+  
+  def self.fieldWithoutIndexingChars doc, r, tag
+    vals = []
+    r.find_by_tag(tag).each do |df|
+      ind2 = df.ind2.to_i
+      if ind2 > 0
+        vals << df.value[ind2..-1]
+      end
+    end
+    return vals
+  end
+    
   end # close the inner module Custom
 end # close the module MARC2Solr
     
