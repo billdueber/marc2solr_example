@@ -20,20 +20,23 @@ There was a major change in the way custom functions work between version 0.1 an
 * I've not yet figured out how to deal with logging done by the java code. At this point, it just spams STDOUT. I'm sure it's solvable, I just haven't solved it yet.
 
 
-## How is this different than Solrmarc?
+## How is this different (not better or worse) than Solrmarc?
 
-* It's JRuby, not java (although you can use java code in JRuby if you'd like)
+* It's JRuby, not java (although you can use java code in JRuby if you'd like), which may make adding custom field routines easier depending on your comfort level with ruby vs java.
 * It talks to Solr via http, not by directly munging the lucene indexes. This allows you to do things like run updates against a live index if you'd like, or run the indexing code on a separate machine than your Solr install.
-* With a single thread, it'll likely be a little slower. If you ramp it up with `threach`, it'll likely be a little faster (I'd *love* to hear from people about this).
-* Values in translation maps can be arrays of values, not just scalars
-* It doesn't have the range of custom functions Solrmarc does as of yet, but collectively building up a library of these should be easy if folks start using it.
 * Configuration is just Ruby files, so you could (in theory) do fancy stuff in there
 
-## What's under the hood?
+## How is this better (in my opinion) than solrmarc
+* Values in translation maps can be arrays of values, not just scalars
+* It allows repeated solr field names (so values can come from multiple custom fields, if need be) and gives custom fields access to previously-computed values (so you don't need to re-do expensive work in many cases)
+* You can easily multithread (with some caveats). With a single thread, it'll likely be a little slower. If you ramp it up with `threach`, it'll likely be a little faster (I'd *love* to hear from people about this).
 
+
+
+## What's under the hood?
+* [marcspec](http://github.org/billdueber/marcspec), a set of classes that allow one to easily pull bits of data out of MARC records (using the above). The whole of marc2solr is really a paper-thin wrapper over marcspec, which also uses the following.
 * [jruby_streaming_update_Solr_server](), a jruby wrapper around [org.apache.Solr.client.Solrj.impl.StreamingUpdateSolrServer](http://lucene.apache.org/Solr/api/org/apache/Solr/client/Solrj/impl/StreamingUpdateSolrServer.html). This provides both the connection to Solr (via StreamingUpdateSolrServer) and the ability to build a Solr document in a ruby-ish way (via SolrInputDocument)
-* [marc4j4r](http://github.com/billdueber/javamarc/tree/master/ruby/marc4j4r/), ruby wrappers around the incredible `marc4j.jar` java library. In this case, the code is based on my fork, which I'm calling [javamarc](http://github.org/billdueber/javamarc) to avoid confusion with Blas Peters' original.
-* [marcspec](http://github.org/billdueber/marcspec), a set of classes that allow one to easily pull bits of data out of MARC records (using the above)
+* [marc4j4r/javamarc](http://github.com/billdueber/javamarc/tree/master/ruby/marc4j4r/), ruby wrappers around the incredible `marc4j.jar` java library. In this case, the code is based on my fork, which I've called [javamarc](http://github.org/billdueber/javamarc) to avoid confusion with Blas Peters' [original code in Tigres's CVS](http://marc4j.tigris.org/), given that I've already applied a significant patch (the original code re-orders tags as they are entered to maintain numeric tag-order regardless of the actual order in the MARC document; my patch just removes that reordering and leaves things alone)
 * [threach](http://github.com/billdueber/threach), a simple "threaded each" that, despite its limitations, can be useful for easily speeding things up by throwing more cores at it.
 
 ## INSTALLATION
