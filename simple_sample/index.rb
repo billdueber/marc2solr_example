@@ -122,19 +122,20 @@
   ]
 },
 
-# And, finally, you can create custom routines.
+# And, finally, you can create custom functions.
 #
 # Every ruby or .jar in the 'lib' directory next to your spec file
-# will be loaded at startup, so all those routines are 
+# will be loaded at startup, so all those functions are 
 # available to you.
 #
 # See the file marc2solr_custom.rb in the simple_spec/lib
 # directory for some very simple examples
 #
 # Note that you can, if you'd like, use a map, default value, and
-# noMapKeyDefault for a custom routine just as you would for a
+# noMapKeyDefault for a custom function just as you would for a
 # regular one.
 
+# (commented out so test output is more readable)
 # {
 #   :solrField => "fullrecord_as_xml",
 #   :module => MARC2Solr::Custom, # the actual constant, NOT A STRING
@@ -142,6 +143,7 @@
 # },
 
 # Custom methods can also take exra arguments
+# (commented out so test output is more readable)
 # {
 #   :solrField => "allfields",
 #   :module => MARC2Solr::Custom,
@@ -167,22 +169,34 @@
 # It's also possible to repeat the same solrField. The result is that all the returned values from
 # all the specs are added as values (to what must obviously be a multiValued solr field).
 #
-# For example, We can add both the full 245 and the 245 minus any indexing chars to the single
+# For example, We can add both the full 245 and the 245 minus any non-filing chars to the single
 # 'title' field like so:
 
 {
   :solrField => 'title',
   :specs => [
-    ['245', '*', '*']
+    ['245', '*', '*'] # Just get the whole thing
   ] 
 },
 
 {
   :solrField => 'title',
   :module => MARC2Solr::Custom,
-  :methodSymbol => :fieldWithoutIndexingChars,
+  :methodSymbol => :fieldWithoutIndexingChars, # and now do it again, minus the non-filing chars
   :methodArgs => ['245']
 },
+
+# Finally, you can have a single custom function provides values for multiple solr fields
+# simultaneously. 
+#
+# Note in this case that a map, default value, etc. make no sense and are unallowed.
+
+{
+  :solrField => ['pubDate', 'pubDateRange'],
+  :module => MARC2Solr::Custom,
+  :methodSymbol => :pubDateAndRange
+}
+
 
   
 ] # don't forget to close off the array!

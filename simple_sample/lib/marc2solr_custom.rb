@@ -1,3 +1,5 @@
+require 'rubygems'
+
 module MARC2Solr
   module Custom
     
@@ -108,17 +110,75 @@ module MARC2Solr
       end
     end    
     
-  
-  def self.fieldWithoutIndexingChars doc, r, tag
-    vals = []
-    r.find_by_tag(tag).each do |df|
-      ind2 = df.ind2.to_i
-      if ind2 > 0
-        vals << df.value[ind2..-1]
+    # A simple function to pull the non-indexing characters off the front of a field
+    # based on the second indicator
+    def self.fieldWithoutIndexingChars doc, r, tag
+      vals = []
+      r.find_by_tag(tag).each do |df|
+        ind2 = df.ind2.to_i
+        if ind2 > 0
+          vals << df.value[ind2..-1]
+        end
+      end
+      return vals
+    end
+    
+    
+    # A helper function -- take in a year, and return a date category
+    def self.getDateRange(date, r)
+      if date < "1500"
+        return "Pre-1500"
+      end
+
+      case date.to_i
+      when 1500..1800 then 
+        century = date[0..1]
+        return century + '00' + century + '99'
+      when 1801..2100 then
+        decade = date[0..2]
+        return decade + "0-" + decade + "9";
+      else
+  #      puts "getDateRange: #{r['001'].value} invalid date #{date}"
       end
     end
-    return vals
-  end
+    
+    
+    # Get the date range, based on the previously-computed pubdate
+      def self.pubDateRange(doc, r, wherePubdateIsStored)
+       previouslyComputedPubdate = doc[wherePubdateIsStored][0]
+       return [self.getDateRange(previouslyComputedPubdate)]
+      end
+    
+    
+    # We can do the same thing as a multi-return function -- compute the pubdate and
+    # the pubdaterange in one fell swoop. 
+    #
+    # In this case, we *could* just use the above self.pubDateRange. However, there
+    # are times when you several fields are based on intermediate values that you
+    # don't want to actually store in the solr document itself (e.g., a set of call number
+    # that you want to normalize or translate in a few different ways, without actually wanting
+    # to store the raw callnumbers in their own field). You may also need access to more metadata
+    # as you're constructing the data (e.g., you may want to store titles and titles-without-non-filing-
+    # character in different fields, but you can't compute one from the other wihout access to the
+    # associated indicator-2 value). 
+    #
+    # So, in this case, we'll get the pubDate and the pubDateRange all at once, just as an example,
+    # and put in the custom spec as:
+    #
+    # {
+    #   :solrField => ['pubDate', 'pubDateRange'],
+    #   :module => MARC2Solr::Custom,
+    #   :methodSymbol => :pubDateAndRange
+    # }
+    
+    
+    def self.pubDateAndRange(doc, r)
+      date = self.getDate(doc, r)
+      return [nil, nil] unless date
+      range = self.getDateRange(date, r)
+      return [date, range]
+    end
+    
     
   end # close the inner module Custom
 end # close the module MARC2Solr
