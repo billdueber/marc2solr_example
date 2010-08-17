@@ -201,9 +201,17 @@ Having said all that, I use `threach` in production with no problems; just progr
 # CHANGES
 0.3
 :  Updated marcspec requirement to allow custom functions to return values for
-   multiple solr fields simultaneously, and added example to `simple_sample/index.rb`
+   multiple solr fields simultaneously, and added example to 
+   `simple_sample/index.rb` and `simple_sample/lib/marc2solr_custom.rb`
+   
 0.2
 :  Added VERSION file and this CHANGES section
-:  Update to use MARCSpec v0.4, which changes the signature of custom functions. Instead of` (record, your,args)`, it's now `(doc, record, your, args)`, where `doc` is a hashlike that contains the already-computed fields. This allows you access to stuff you've already done in subsequent field computations (e..g, use the results of the `format` fields to influence setting -- or not -- the `serialTitle` field).
+:  Update to use MARCSpec v0.4, which changes the signature of custom 
+   functions. Instead of` (record, your,args)`, it's now `(doc, record, your, 
+   args)`, where `doc` is a hashlike that contains the already-computed 
+   fields. This allows you access to stuff you've already done in subsequent 
+   field computations (e..g, use the results of the `format` fields to 
+   influence setting -- or not -- the `serialTitle` field).
+
 0.1
 :  First public release
