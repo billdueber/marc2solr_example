@@ -1,11 +1,11 @@
 initialTime  = Time.new
-
 require 'rubygems'
 require 'bundler'
 Bundler.setup
 Bundler.require(:default)
 require 'logger'
 require 'pp'
+
 
 ####################################################################################
 ################     Get the arguments        ######################################
@@ -17,7 +17,6 @@ unless marcfile =~ /\S/ and baseDir =~ /\S/
   puts "Need both a marcfile and a directory"
   exit
 end
-
 
 ####################################################################################
 ################################## CONFIG ##########################################
@@ -62,6 +61,7 @@ solrdocQueueSize = 64
 #### Logging ####
 
 logfilename = File.basename(marcfile).split(/\./)[0] + '-' + Time.new.strftime('%Y%m%d-%H%M%S') + '.log'
+marcfileextension  = File.basename(marcfile).split(/\./)[-1]
 $LOG = Logger.new(logfilename)
 $LOG.datetime_format = '%Y%m%d %H:%M:%S'
 # $LOG.level = Logger::DEBUG
@@ -73,9 +73,10 @@ $stderr.puts "Processing #{marcfile}\n Logfile is #{logfilename}"
 
 #### Input file characteristics ####
 
-#readerType = :strictmarc 
-readerType = :permissivemarc 
-#readerType = :marcxml
+readerType = :figureOutByExtension
+# readerType = :strictmarc 
+# readerType = :permissivemarc 
+# readerType = :marcxml
 
 defaultEncoding = nil # let it guess
 # defaultEncoding = :utf8
@@ -166,7 +167,21 @@ end
 
 # Get the reader
 
-reader = MARC4J4R::Reader.new(marcfile, readerType, defaultEncoding)
+typeOfReader = readerType # as set up above in config
+if readerType == :figureOutByExtension
+  case marcfileextension 
+  when /XML/i
+    typeOfReader = :marcxml
+  when /SEQ/i
+    typeOfReader = :alephSequential
+  else
+    typeOfReader = :permissivemarc
+  end
+end
+    
+  
+
+reader = MARC4J4R::Reader.new(marcfile, typeOfReader, defaultEncoding)
 
 $LOG.info "Got the reader"
 ## Clear things out if requested, and it's not a dry run
