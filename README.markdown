@@ -201,8 +201,8 @@ Having said all that, I use `threach` in production with no problems; just progr
 # CHANGES
 0.4
 :  Update marcspec version requirement to 0.6; this changes the configuration
-   for a custom function to indicate what module function with the key
-   :functionSymbol (instead of the former :moduleSymbol). It's a module function, not any sort of method. 
+   for a custom function to indicate what module function with the key   :functionSymbol (instead of the former :moduleSymbol). It's a module function, not any sort of method. 
+   
 0.3
 :  Updated marcspec requirement to allow custom functions to return values for
    multiple solr fields simultaneously, and added example to 
