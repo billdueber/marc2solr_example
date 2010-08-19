@@ -8,7 +8,7 @@ It relies on [jruby](http://jruby.org/) to pull it all together; this will not r
 
 ## VERSION
 
-0.3.0
+0.4.1
 
 Consider this a *beta* -- things are pretty settled down, but some parts of the interface (as represented by marcspec) may still change. Announcements of updates to this code and the libraries that underly it will be made at [my blog](http://robotlibrarian.billdueber.com/).
 
@@ -66,10 +66,11 @@ Maybe something like this:
 
 ### Installed the required gems
 
-`marc2Solr` is set up to use [Bundler](http://gembundler.com). 
+NOTE: We're no longer using Bundler, as it screws up trying to just drop stuff in your `lib` directory. Instead, there's a simple rake task to list what you need.
 
-    jruby -S gem install bundler
-    jruby -S bundle install
+    jruby -S rake
+    # get list of gems you need to install/upgrade
+    jruby -S gem <blah blah blah>
     
 ### Translate your Solrmarc files (optional)
 
@@ -199,6 +200,9 @@ There are some issues with using `threach`:
 Having said all that, I use `threach` in production with no problems; just program defensively.
 
 # CHANGES
+0.4.1
+: Stop using Bundler; it messes up trying to include custom code in your `lib` directory.
+
 0.4
 :  Update marcspec version requirement to 0.7; this changes the configuration
    for a custom function to indicate what module function with the key   :functionSymbol (instead of the former :moduleSymbol). It's a module function, not any sort of method. 

@@ -1,8 +1,10 @@
 initialTime  = Time.new
 require 'rubygems'
-require 'bundler'
-Bundler.setup
-Bundler.require(:default)
+
+require 'marcspec'
+require 'marc4j4r'
+require 'jruby_streaming_update_solr_server'
+
 require 'logger'
 require 'pp'
 
