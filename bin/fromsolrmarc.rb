@@ -122,7 +122,7 @@ File.open(propfile) do |fh|
       csf = MARCSpec::CustomSolrSpec.new(:solrField=>fieldname,
                                          :module => MARC2Solr::Custom,
                                          :functionSymbol => :getAllSearchableFields,
-                                         :methodArgs => [low, high])
+                                         :functionArgs => [low, high])
       ss << csf
       next
     end

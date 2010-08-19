@@ -148,7 +148,7 @@
 #   :solrField => "allfields",
 #   :module => MARC2Solr::Custom,
 #   :functionSymbol => :getAllSearchableFields,
-#   :methodArgs => ['010', '999'], # lower and upper bounds of the tags to get data from
+#   :functionArgs => ['010', '999'], # lower and upper bounds of the tags to get data from
 # },  
 
 # Note that since this is all Ruby, you can pass ruby objects as well; in this case,
@@ -157,7 +157,7 @@
   :solrField => "oclc",
   :module => MARC2Solr::Custom,
   :functionSymbol => :valsByPattern,
-  :methodArgs => [
+  :functionArgs => [
     '035', # the tag
     'a',   # the subfield code or list of subfield codes
     /(?:oclc|ocolc|ocm|ocn).*?(\d+)/i, # the pattern to match
@@ -183,7 +183,7 @@
   :solrField => 'title',
   :module => MARC2Solr::Custom,
   :functionSymbol => :fieldWithoutIndexingChars, # and now do it again, minus the non-filing chars
-  :methodArgs => ['245']
+  :functionArgs => ['245']
 },
 
 # Finally, you can have a single custom function provides values for multiple solr fields

@@ -133,7 +133,7 @@ A simple custom routine looks like this:
       :solrField => myField,
       :module => MARC2Solr::Custom::WhatzamattaU,
       :functionSymbol => :doSomethingCustom,
-      :methodArgs => ['the first arg', 'the second arg']
+      :functionArgs => ['the first arg', 'the second arg']
     }
     
 You can see that the module function (note that it's defined via `self.functionName`) will always have at least two arguments (`doc` and `record`), plus whatever you need to have passed in to do the work. When the system makes the call, you grab what you need from the document and the record and return an array of values. 
