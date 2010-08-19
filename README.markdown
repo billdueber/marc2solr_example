@@ -132,7 +132,7 @@ A simple custom routine looks like this:
     {
       :solrField => myField,
       :module => MARC2Solr::Custom::WhatzamattaU,
-      :methodSymbol => :doSomethingCustom,
+      :functionSymbol => :doSomethingCustom,
       :methodArgs => ['the first arg', 'the second arg']
     }
     
@@ -199,6 +199,10 @@ There are some issues with using `threach`:
 Having said all that, I use `threach` in production with no problems; just program defensively.
 
 # CHANGES
+0.4
+:  Update marcspec version requirement to 0.6; this changes the configuration
+   for a custom function to indicate what module function with the key
+   :functionSymbol (instead of the former :moduleSymbol). It's a module function, not any sort of method. 
 0.3
 :  Updated marcspec requirement to allow custom functions to return values for
    multiple solr fields simultaneously, and added example to 

@@ -168,7 +168,7 @@ module MARC2Solr
     # {
     #   :solrField => ['pubDate', 'pubDateRange'],
     #   :module => MARC2Solr::Custom,
-    #   :methodSymbol => :pubDateAndRange
+    #   :functionSymbol => :pubDateAndRange
     # }
     
     

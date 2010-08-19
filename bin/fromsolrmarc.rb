@@ -94,7 +94,7 @@ File.open(propfile) do |fh|
     if spec == 'FullRecordAsXML'
       csf = MARCSpec::CustomSolrSpec.new(:solrField=>fieldname,
                                           :module => MARC2Solr::Custom,
-                                          :methodSymbol => :asXML)
+                                          :functionSymbol => :asXML)
       ss << csf
       next
     end
@@ -102,7 +102,7 @@ File.open(propfile) do |fh|
     if spec == 'FullRecordAsMARC'
       csf = MARCSpec::CustomSolrSpec.new(:solrField=>fieldname,
                                           :module => MARC2Solr::Custom,
-                                          :methodSymbol => :asMARC)
+                                          :functionSymbol => :asMARC)
       ss << csf
       next
     end
@@ -110,7 +110,7 @@ File.open(propfile) do |fh|
     if spec == 'DateOfPublication'
       csf = MARCSpec::CustomSolrSpec.new(:solrField=>fieldname,
                                           :module => MARC2Solr::Custom,
-                                          :methodSymbol => :getDate)
+                                          :functionSymbol => :getDate)
       ss << csf
       next
     end
@@ -121,7 +121,7 @@ File.open(propfile) do |fh|
       high = $2
       csf = MARCSpec::CustomSolrSpec.new(:solrField=>fieldname,
                                          :module => MARC2Solr::Custom,
-                                         :methodSymbol => :getAllSearchableFields,
+                                         :functionSymbol => :getAllSearchableFields,
                                          :methodArgs => [low, high])
       ss << csf
       next

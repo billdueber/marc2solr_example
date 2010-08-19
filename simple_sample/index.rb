@@ -139,7 +139,7 @@
 # {
 #   :solrField => "fullrecord_as_xml",
 #   :module => MARC2Solr::Custom, # the actual constant, NOT A STRING
-#   :methodSymbol => :asXML
+#   :functionSymbol => :asXML
 # },
 
 # Custom methods can also take exra arguments
@@ -147,7 +147,7 @@
 # {
 #   :solrField => "allfields",
 #   :module => MARC2Solr::Custom,
-#   :methodSymbol => :getAllSearchableFields,
+#   :functionSymbol => :getAllSearchableFields,
 #   :methodArgs => ['010', '999'], # lower and upper bounds of the tags to get data from
 # },  
 
@@ -156,7 +156,7 @@
 {
   :solrField => "oclc",
   :module => MARC2Solr::Custom,
-  :methodSymbol => :valsByPattern,
+  :functionSymbol => :valsByPattern,
   :methodArgs => [
     '035', # the tag
     'a',   # the subfield code or list of subfield codes
@@ -182,7 +182,7 @@
 {
   :solrField => 'title',
   :module => MARC2Solr::Custom,
-  :methodSymbol => :fieldWithoutIndexingChars, # and now do it again, minus the non-filing chars
+  :functionSymbol => :fieldWithoutIndexingChars, # and now do it again, minus the non-filing chars
   :methodArgs => ['245']
 },
 
@@ -194,7 +194,7 @@
 {
   :solrField => ['pubDate', 'pubDateRange'],
   :module => MARC2Solr::Custom,
-  :methodSymbol => :pubDateAndRange
+  :functionSymbol => :pubDateAndRange
 }
 
 
