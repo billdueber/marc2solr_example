@@ -218,8 +218,7 @@ else
 end
 
 reader.send(method, *args) do |r, i|
-# reader.threach(workerThreads, :each_with_index) do |r, i|
-# reader.each_with_index do |r, i|
+  
   doc = ss.doc_from_marc(r)
   # If you've got super-custom routines (that don't get put in your index file),
   # this is the spot for them.

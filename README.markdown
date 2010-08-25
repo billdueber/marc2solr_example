@@ -68,9 +68,17 @@ Maybe something like this:
 
 NOTE: We're no longer using Bundler, as it screws up trying to just drop stuff in your `lib` directory. Instead, there's a simple rake task to list what you need.
 
+    jruby -S install jruby-openssl jeweler
     jruby -S rake
-    # get list of gems you need to install/upgrade
-    jruby -S gem <blah blah blah>
+      # Missing some dependencies. Install them with the following commands:
+      #      gem install marc4j4r --version ">= 0.9.0"
+      #      gem install jruby_streaming_update_solr_server --version ">= 0.3.1"
+      #      gem install marcspec --version ">= 0.7.2"
+      #      gem install threach --version ">= 0.2.0"
+    
+    jruby -S gem install 
+
+    
     
 ### Translate your Solrmarc files (optional)
 
