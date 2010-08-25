@@ -2,16 +2,16 @@
  :maptype=>:kv,
  :mapname=>"ht_namespace_map",
  :map => {"mdp"=>"University of Michigan",
- "wu"=>"University of Wisconsin",
  "gwla"=>"University of Michigan",
+ "pst"=>"Penn State University ",
  "miua"=>"University of Michigan",
- "miun"=>"University of Michigan",
  "inu"=>"Indiana University",
- "uc1"=>"University of California",
- "uc2"=>"University of California",
- "pst"=>"Penn State University",
- "umn"=>"University of Minnesota",
+ "wu"=>"University of Wisconsin",
+ "nnc2"=>"Columbia University",
  "nnc1"=>"Columbia University",
- "nnc2"=>"Columbia University"}
+ "umn"=>"University of Minnesota",
+ "uc2"=>"University of California",
+ "uc1"=>"University of California",
+ "miun"=>"University of Michigan"}
 
 }
