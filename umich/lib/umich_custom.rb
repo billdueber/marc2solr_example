@@ -62,21 +62,18 @@ module MARC2Solr
       end
       
       def self.getTitleSortable doc, r, codes
-        data = []
-        r.find_by_tag('245').each do |f|
-          subvals = f.sub_values(codes)
-          subvals.compact!
-          if subvals.size > 0
-            val = subvals.join(' ')
-            ind2 = f.indicator2.to_i
-            if ind2 > 0 and ind2 < val.length
-             data << val[ind2..-1]
-            else
-              data << val
-            end
+        data = nil
+        f = r['245'] # only the first one!
+        subvals = f.sub_values(codes)
+        subvals.compact!
+        if subvals.size > 0
+          val = subvals.join(' ')
+          ind2 = f.indicator2.to_i
+          if ind2 > 0 and ind2 < val.length
+            val = val[ind2..-1]
           end
         end
-        return data.map{|v| v.gsub(/\p{Punct}/, ' ').gsub(/\s+/, ' ').strip.downcase }
+        return val.gsub(/\p{Punct}/, ' ').gsub(/\s+/, ' ').strip.downcase 
       end
 
       def self.getDateRange(date, r)
