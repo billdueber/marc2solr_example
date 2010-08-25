@@ -59,7 +59,7 @@ newpropfile = 'index.rb'
 
 
 ss  = MARCSpec::SpecSet.new
-Dir.glob(trmapdir + '/*').each do |f|
+Dir.glob(trmapdir + '/*.properties').each do |f|
   File.open(f) do |fh|
     fh.each_line do |line|
       next if line =~ /^\s*#/
