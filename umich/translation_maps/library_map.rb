@@ -48,6 +48,9 @@
  [/^HATCH DREF/, "Hatcher Graduate Documents Center"],
  [/^HATCH DOCS/, "Hatcher Graduate Documents Center"],
  [/^HATCH DMIC/, "Hatcher Graduate Documents Center"],
- [/^HATCH DFILE/, "Hatcher Graduate Documents Center"]]
+ [/^HATCH DFILE/, "Hatcher Graduate Documents Center"],
+ [/^DHC/, "Donald Hall Collection"]
+ 
+]
 
 }
