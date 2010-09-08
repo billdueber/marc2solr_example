@@ -12,33 +12,33 @@ It relies on [jruby](http://jruby.org/) to pull it all together; this will not r
 
 Consider this a *beta* -- things are pretty settled down, but some parts of the interface (as represented by marcspec) may still change. Announcements of updates to this code and the libraries that underly it will be made at [my blog](http://robotlibrarian.billdueber.com/).
 
-
-## MAJOR CHANGES
-
-There was a major change in the way custom functions work between version 0.1 and 0.2 -- see the section "CHANGES" at the end of this file.
-
 ## Current problems
 
 * There are debugging issues with `threach` -- see the `threach` section, below
 * I've not yet figured out how to deal with logging done by the java code. At this point, it just spams STDOUT. I'm sure it's solvable, I just haven't solved it yet.
 
+## How is this worse than Solrmarc?
+* Depending on what you're doing with custom functions, Solrmarc is likely faster. Unless you multi-thread (see below).
+* You need to install JRuby (but you can do that in userspace easily).
+* Right now, there's not a big library of custom functions to choose from.
+* Some Solrmarc syntax isn't supported (e.g., character ranges from variable MARC fields).
 
 ## How is this different (not better or worse) than Solrmarc?
 
 * It's JRuby, not java (although you can use java code in JRuby if you'd like), which may make adding custom field functions easier depending on your comfort level with ruby vs java.
 * It talks to Solr via http, not by directly munging the lucene indexes. This allows you to do things like run updates against a live index if you'd like, or run the indexing code on a separate machine than your Solr install.
-* Configuration is just Ruby files, so you could (in theory) do fancy stuff in there
+* Configuration is just Ruby files, so you could (in theory) do fancy stuff in there. The tradeoff is that the syntax is pickier. 
 
-## How is this better (in my opinion) than solrmarc
+## How is this better (in my opinion) than Solrmarc
 * Values in translation maps can be arrays of values, not just scalars
-* A single custom function can return values for multiple solr fields simultaneously. 
+* A single custom function can return values for multiple Solr fields simultaneously. 
 * It allows repeated solr field names (so values can come from multiple custom fields, if need be) and gives custom fields access to previously-computed values (so you don't need to re-do expensive work in many cases)
 * You can easily multithread (with some caveats). With a single thread, it'll likely be a little slower. If you ramp it up with `threach`, it'll likely be a little faster (I'd *love* to hear from people about this).
 
 
 
 ## What's under the hood?
-* [marcspec](http://github.org/billdueber/marcspec), a set of classes that allow one to easily pull bits of data out of MARC records (using the above). The whole of marc2solr is really a paper-thin wrapper over marcspec, which also uses the following.
+* [marcspec](http://github.org/billdueber/marcspec), a set of classes that allow one to easily pull bits of data out of MARC records (using the above). The whole of marc2solr is really a paper-thin wrapper over marcspec.
 * [jruby_streaming_update_Solr_server](http://github.com/billdueber/jruby_streaming_update_solr_server), a jruby wrapper around [org.apache.Solr.client.Solrj.impl.StreamingUpdateSolrServer](http://lucene.apache.org/Solr/api/org/apache/Solr/client/Solrj/impl/StreamingUpdateSolrServer.html). This provides both the connection to Solr (via StreamingUpdateSolrServer) and the ability to build a Solr document in a ruby-ish way (via SolrInputDocument)
 * [marc4j4r/javamarc](http://github.com/billdueber/javamarc/tree/master/ruby/marc4j4r/), ruby wrappers around the incredible `marc4j.jar` java library. In this case, the code is based on my fork, which I've called [javamarc](http://github.org/billdueber/javamarc) to avoid confusion with Blas Peters' [original code in Tigres's CVS](http://marc4j.tigris.org/), given that I've already applied a significant patch (the original code re-orders tags as they are entered to maintain numeric tag-order regardless of the actual order in the MARC document; my patch just removes that reordering and leaves things alone)
 * [threach](http://github.com/billdueber/threach), a simple "threaded each" that, despite its limitations, can be useful for easily speeding things up by throwing more cores at it.
@@ -76,8 +76,7 @@ NOTE: We're no longer using Bundler, as it screws up trying to just drop stuff i
       #      gem install marcspec --version ">= 0.7.2"
       #      gem install threach --version ">= 0.2.0"
     
-    jruby -S gem install 
-
+Remember you need to install to your JRuby setup -- use "jruby -S gem install ..."
     
     
 ### Translate your Solrmarc files (optional)
@@ -87,7 +86,7 @@ If you have a Solrmarc installation, you can attempt an automated translation of
 We assume:
 
 *  There's a single index file (e.g. umich_index.properties)
-*  There's a single directory of translation maps called `translation_maps` "next to" the index file
+*  There's a single directory of translation maps called `translation_maps` "next to" the index file. 
 
 In this case, you can run
     jruby bin/fromSolrmarc.rb /path/to/the/index.properties /my/new/dir
@@ -101,10 +100,13 @@ The results will be:
 * Creation of `/my/new/dir`
 * Translation, as much as possible, of `umich_index.properties` into `index.rb`
 * Translation of all the translation maps
-* Creation of a 'fromSolrmarc.log' file in `/my/new/dir`
+* Creation of a 'fromSolrmarc.log' file in `/my/new/dir` that shows what you need to do by hand.
 
-Check out the logfile to see what the translator was unable to move over. Most custom functions will need to be re-written in ruby; a small few are provided with this distribution (see `/my/new/dir/lib/marc2Solr_custom.rb`).
+Check out `fromSolrmarc.log` to see what the translator was unable to move over. Most custom functions will need to be re-written in ruby; a small few are provided with this distribution (see `/my/new/dir/lib/marc2Solr_custom.rb`), and you can see others in the  `umich/lib` directory, which shows the actual stuff we use at UMich.
 
+## Adding to/building your configuration files
+
+The real work of loading the index and translation maps is done `marcspec`. The [[marcspec wiki|http://github.com/billdueber/marcspec/wiki/]] has more information about the config files and all the options, but first look at the samples files in the `simple_sample` directory.
 
 ### Create your own index.rb and translation files (eventually)
 
@@ -149,14 +151,15 @@ You can see that the module function (note that it's defined via `self.functionN
 
 Note that *all* files in the `targetdir/lib` directory that end in either `.rb` or `.jar` will be loaded; you can include both ruby code java code in this way. Just create your file and dump it in there.
 
+Again the [[marcspec wiki|http://github.com/billdueber/marcspec/wiki/Custom-Functions]] is the best place for more docs.
+
 ## Running to debug
 
-Right now, the configuration above and beyond what's in the index and translation maps (e.g., where Solr is, how many threads to use, what kind of MARC file to expect) is just inlined at the top of the `marc2Solr.rb` file; this will have to change at some point.
+Right now, the configuration above and beyond what's in the index and translation maps (e.g., where Solr is, how many threads to use, what kind of MARC file to expect) is just inlined at the top of the `marc2Solr.rb` file; this will have to change at some point. 
 
 ### Edit the marc2Solr.rb file
 
-The top of the `marc2Solr.rb` file is full of all sorts of configuration information -- where Solr is, whether to commit at the end, etc. As shipped, it expects a binary MARC file with unspecified MARC encoding, and will 
-NOT send stuff to Solr -- just to STDOUT.
+The top of the `marc2Solr.rb` file is full of all sorts of configuration information -- where Solr is, whether to commit at the end, etc. As shipped, it expects a MARC file whose type can be figured out from the extension, with unspecified MARC encoding, and will NOT send stuff to Solr -- just to STDOUT.
 
 ### Run it in debug mode and check out the results
 
@@ -166,11 +169,11 @@ None of those options are mutually exclusive; you can push to Solr and STDOUT at
 
 In any case, assuming you haven't messed with anything, go ahead and run
 
-    jruby marc2Solr.rb /path/to/marcfile.mrc /dir/containing/index > out.txt
+    jruby marc2Solr.rb /path/to/marcfile.mrc /dir/containing/index.rb > out.txt &
 
 ...e.g.,
 
-    jruby marc2Solr.rb /path/to/mymarcfilie.mrc ./simple_sample > out.txt
+    jruby marc2Solr.rb /path/to/mymarcfilie.mrc ./simple_sample > out.txt &
 
 Assuming you haven't changed anything in the config section of marc2Solr, you should have two files: 
 
@@ -187,13 +190,15 @@ Edit marc2Solr.rb to do the following:
 *  Put the URL to your Solr install -- *not* all the way to the update handler; just to the Solr installation itself. This will likely look something like `http://machine.name:port/Solr` (or, for a vufind install, `http://machine.name:port/Solr/biblio` )
 * Set `javabin` to true if you've defined the binary update script in your `Solrconfig.xml` file. It should look like this:
 
+```xml
       <requestHandler name="/update/javabin" 
                     class="Solr.BinaryUpdateRequestHandler" />
+```
 
 The javabin handler isn't necessary, but it speeds things up.
 
 * Make sure to set actuallySendToSolr to 'true'
-* Decide whether or not to set `cleanOutSolr`; if true, the target Solr install will be completely emptied before indexing begins.
+* Decide whether or not to set `cleanOutSolr`; if true, the target Solr install will be completely emptied before indexing begins. So, you know, be careful. 
 
 The logfile will again show you what's going on, including rough speeds.
 
