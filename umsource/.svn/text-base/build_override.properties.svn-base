@@ -1,0 +1,9 @@
+#Mon Sep 21 13:35:11 EDT 2009
+solr.version=1.4_umich
+solr.hosturl=http\://localhost\:8024/solr
+distribution.jar.name=umich_SolrMarc
+example.configuration=GenericVuFind
+exe.mem.args=-Xms32000m -Xmx32000m
+marc.default_encoding=UTF8
+custom.jar.name=Vufind
+custom.config.file.prefix=umich
