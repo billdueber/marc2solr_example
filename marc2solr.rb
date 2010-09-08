@@ -1,6 +1,7 @@
+$KCODE = 'utf8'
 initialTime  = Time.new
 require 'rubygems'
-
+require 'threach'
 require 'marcspec'
 require 'marc4j4r'
 require 'jruby_streaming_update_solr_server'
