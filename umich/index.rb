@@ -101,7 +101,7 @@
   :solrField => 'sdrnum',
   :module => MARC2Solr::Custom,
   :functionSymbol => :valsByPattern,
-  :functionArgs => ['035', 'r', /^sdr-?(.*)/, 1]
+  :functionArgs => ['035', 'a', /^sdr-?(.*)/, 0]
 },
 
 {
@@ -153,7 +153,7 @@
   ["780", "xz"],
   ["785", "xz"],
   ["786", "xz"],
-  ["787", "xz"],
+  ["787", "xz"]
  ]
 },
 {
@@ -340,6 +340,12 @@
   :functionArgs => [['a']]
 },
 
+{
+  :solrField => 'serialTitle_rest',
+  :module => MARC2Solr::Custom::UMich,
+  :functionSymbol => :getSerialTitleRest
+},
+
 
 
 ################################
@@ -396,6 +402,7 @@
   ["043", "a"],
  ]
 },
+
 {
  :solrField=> "era",
  :specs => [
@@ -476,6 +483,14 @@
 {
  :solrField=> "ht_availability",
  :mapname => "availability_map_ht",
+ :specs => [
+  ["974", "r"],
+ ]
+},
+
+{
+ :solrField=> "ht_availability_intl",
+ :mapname => "availability_map_ht_intl",
  :specs => [
   ["974", "r"],
  ]

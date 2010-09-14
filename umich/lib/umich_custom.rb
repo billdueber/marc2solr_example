@@ -1,10 +1,41 @@
+$KCODE = 'utf8'
 require 'rubygems'
 require 'json'
+require 'marcspec'
 
 
 module MARC2Solr
   module Custom
     module UMich
+      
+      # Create a marc spec for SerialTitleRest
+      
+      SerialTitleRestFieldsSpec = MARCSpec::SolrFieldSpec.fromHash( 
+        {
+        :solrField => 'serialTitleRest_internal',
+        :specs => [
+          ['130', 'adfgklmnoprst'],
+          ["210", "ab"],
+          ["222", "ab"],
+          ["240", "adfgklmnprs"],
+          ["246", "abdenp"],
+          ["247", "abdenp"],
+          ["730", "anp"],
+          ["740", "anp"],
+          ["765", "st"],
+          ["767", "st"],
+          ["770", "st"],
+          ["772", "st"],
+          ["775", "st"],
+          ["776", "st"],
+          ["777", "st"],
+          ["780", "st"],
+          ["785", "st"],
+          ["786", "st"],
+          ["787", "st"]          
+        ]
+      })
+      
       
       # Get the language(s)
       def self.getLanguage(doc, r)
@@ -61,8 +92,17 @@ module MARC2Solr
         end
       end
       
+      
+      def self.getSerialTitleRest doc, r
+        if doc['format'] and doc['format'].include? 'Serial'
+          return SerialTitleRestFieldsSpec.marc_values(r)
+        else
+          return []
+        end
+      end
+      
+      
       def self.getTitleSortable doc, r, codes
-        data = nil
         f = r['245'] # only the first one!
         subvals = f.sub_values(codes)
         subvals.compact!
@@ -73,7 +113,7 @@ module MARC2Solr
             val = val[ind2..-1]
           end
         end
-        return val.gsub(/\p{Punct}/, ' ').gsub(/\s+/, ' ').strip.downcase 
+        return val.gsub(/[^\p{L}\p{N}]/, ' ').gsub(/\s+/, ' ').strip.downcase 
       end
 
       def self.getDateRange(date, r)
@@ -116,9 +156,9 @@ module MARC2Solr
         udates = fields.map {|f| f.sub_values('d')}
         udates.flatten!
         udates.compact!
-        updatedates = udates
-        if (updatedates.size > 0)
-          h['ht_id_update'] = updatedates
+        udates.uniq!
+        if (udates.size > 0)
+          h['ht_id_update'] = udates
         else
           h['ht_id_update'] = defaultDate
         end

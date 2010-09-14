@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'marcspec'
+require 'pp'
 
 $: << File.dirname(__FILE__)
 require 'jackson-core-asl-1.4.3.jar'
@@ -18,13 +19,13 @@ module MARC2Solr
       @spechash = {
         :solrField => 'internal_hlb',
         :specs => [
-          ['050', '*', '*', 'ab'],
-          ['082', '*', '*', 'a'],
-          ['090', '*', '*', 'ab'],
-          ['099', '*', '*', 'a'],
-          ['086', '*', '*', 'a'],
-          ['086', '*', '*', 'z'],
-          ['852', '*', '*', 'hij'],
+          ['050','ab'],
+          ['082','a'],
+          ['090','ab'],
+          ['099','a'],
+          ['086','a'],
+          ['086','z'],
+          ['852','hij'],
           ] 
       }
       
