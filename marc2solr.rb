@@ -119,7 +119,11 @@ loadAllFilesIn.uniq.compact.each do |dir|
     $LOG.info "Skipping load directory '#{dir}': Not found"
   end
   $LOG.info "Loading files in #{dir}"
-  Dir.glob(["#{dir}/*.rb", "#{dir}/*.jar"]).each do |x|
+  Dir.glob(["#{dir}/*.jar"]).each do |x|
+    $LOG.debug "Loading #{x}"
+    require x
+  end
+  Dir.glob(["#{dir}/*.rb"]).each do |x|
     $LOG.debug "Loading #{x}"
     require x
   end
@@ -176,7 +180,7 @@ if readerType == :figureOutByExtension
   when /XML/i
     typeOfReader = :marcxml
   when /SEQ/i
-    typeOfReader = :alephSequential
+    typeOfReader = :alephsequential
   else
     typeOfReader = :permissivemarc
   end
