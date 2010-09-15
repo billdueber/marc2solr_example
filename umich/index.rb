@@ -67,6 +67,7 @@
 {
  :solrField=> "location",
  :mapname => "location_map",
+ :noMapKeyDefault => :passthrough,
  :specs => [
   ["971", "a"],
   ["852", "b"],
