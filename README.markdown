@@ -20,7 +20,7 @@ Consider this a *beta* -- things are pretty settled down, but some parts of the 
 ## How is this worse than Solrmarc?
 * Depending on what you're doing with custom functions, Solrmarc is likely faster. Unless you multi-thread (see below).
 * You need to install JRuby (but you can do that in userspace easily).
-* Right now, there's not a big library of custom functions to choose from.
+* There's not yet a big library of custom functions to choose from.
 * Some Solrmarc syntax isn't supported (e.g., character ranges from variable MARC fields).
 
 ## How is this different (not better or worse) than Solrmarc?
@@ -71,12 +71,12 @@ NOTE: We're no longer using Bundler, as it screws up trying to just drop stuff i
     jruby -S install jruby-openssl jeweler
     jruby -S rake
       # Missing some dependencies. Install them with the following commands:
-      #      gem install marc4j4r --version ">= 0.9.0"
-      #      gem install jruby_streaming_update_solr_server --version ">= 0.3.1"
-      #      gem install marcspec --version ">= 0.7.2"
-      #      gem install threach --version ">= 0.2.0"
+      #      gem install marc4j4r --version ">= X.X.X"
+      #      gem install jruby_streaming_update_solr_server --version ">= X.X.X"
+      #      gem install marcspec --version ">= X.X.X"
+      #      gem install threach --version ">= X.X.X"
     
-Remember you need to install to your JRuby setup -- use "jruby -S gem install ..."
+Remember you need to install to your JRuby setup -- use "jruby -S gem install ..." to install the dependencies.
     
     
 ### Translate your Solrmarc files (optional)
@@ -86,7 +86,7 @@ If you have a Solrmarc installation, you can attempt an automated translation of
 We assume:
 
 *  There's a single index file (e.g. umich_index.properties)
-*  There's a single directory of translation maps called `translation_maps` "next to" the index file. 
+*  There's a single directory of translation maps called `translation_maps` "next to" the index file (i.e., in the same parent directory)
 
 In this case, you can run
     jruby bin/fromSolrmarc.rb /path/to/the/index.properties /my/new/dir
@@ -102,11 +102,11 @@ The results will be:
 * Translation of all the translation maps
 * Creation of a 'fromSolrmarc.log' file in `/my/new/dir` that shows what you need to do by hand.
 
-Check out `fromSolrmarc.log` to see what the translator was unable to move over. Most custom functions will need to be re-written in ruby; a small few are provided with this distribution (see `/my/new/dir/lib/marc2Solr_custom.rb`), and you can see others in the  `umich/lib` directory, which shows the actual stuff we use at UMich.
+Check out `fromSolrmarc.log` to see what the translator was unable to move over. Most custom functions will need to be re-written in ruby; a small few are provided with this distribution (see `/my/new/dir/lib/marc2Solr_custom.rb`), and you can see others in the  `umich/lib` directory, which shows the actual stuff we use at UMich as a demonstration.
 
 ## Adding to/building your configuration files
 
-The real work of loading the index and translation maps is done `marcspec`. The [[marcspec wiki|http://github.com/billdueber/marcspec/wiki/]] has more information about the config files and all the options, but first look at the samples files in the `simple_sample` directory.
+The real work of loading the index and translation maps is done `marcspec`. The [[marcspec wiki|http://github.com/billdueber/marcspec/wiki/]] has more information about the config files and all the options, but first look at the samples files in the `simple_sample` directory. Those simple examples will get you 98% of they way there.
 
 ### Create your own index.rb and translation files (eventually)
 
@@ -116,7 +116,9 @@ within `simple_sample`. Start there, and send any questions to me so I can impro
 
 ### Create and/or use custom functions
 
-There are a small handful of custom functions in `lib/marc2Solr_custom.rb` (basically, just the ones I was using), which is copied into the `lib/` directory when you run `fromSolrmarc.rb`, too. You can see how to apply them by looking at `simple_sample/index.rb` and how to write them by looking at `simiple_sample/lib/marc2Solr_custom.rb`.
+**Note**: The real documentation for Custom Functions is in the [[marcspec wiki|http://github.com/billdueber/marcspec/wiki/]]. This is just a simple example.
+
+There are a small handful of custom functions in `lib/marc2Solr_custom.rb` (basically, just the ones I was using), which is copied into the `lib/` directory when you run `fromSolrmarc.rb`, too. You can see how to apply them by looking at `simple_sample/index.rb` and how to write them by looking at `simiple_sample/lib/marc2Solr_custom.rb`. Even more can be seen in the umich code, which is what we use on our live system.
 
 To create your own custom functions, create a module and provide module-level function (again, see the example file in `lib/`). A custom routine specification just gives the module, method name (as a symbol), and optional arguments to pass besides the mid-construction document (a hashlike) and the MARC4J4R::Record object. 
 
@@ -155,13 +157,13 @@ Again the [[marcspec wiki|http://github.com/billdueber/marcspec/wiki/Custom-Func
 
 ## Running to debug
 
-Right now, the configuration above and beyond what's in the index and translation maps (e.g., where Solr is, how many threads to use, what kind of MARC file to expect) is just inlined at the top of the `marc2Solr.rb` file; this will have to change at some point. 
+Right now, the configuration above and beyond what's in the index and translation maps (e.g., where Solr is, how many threads to use, what kind of MARC file to expect) is just inlined at the top of the `marc2Solr.rb` file; this will have to change at some point. Opinions about what the config file should hold and/or look like are welcome, as are ideas about a DSL for the whole index.rb configuration.
 
 ### Edit the marc2Solr.rb file
 
 The top of the `marc2Solr.rb` file is full of all sorts of configuration information -- where Solr is, whether to commit at the end, etc. As shipped, it expects a MARC file whose type can be figured out from the extension, with unspecified MARC encoding, and will NOT send stuff to Solr -- just to STDOUT.
 
-### Run it in debug mode and check out the results
+### Run it sending to STDOUT instead of Solr and check out the results
 
 `marc2Solr.rb` has three configuration variables (`actuallySendToSolr`, `ppMARC`, and `ppDoc`) to dictate what to do in terms of actually sending stuff to Solr and spitting debug info out to STDOUT. It can be useful at times to push out both the MARC record and what it gets turned into for debugging purposes. 
 
@@ -198,7 +200,7 @@ Edit marc2Solr.rb to do the following:
 The javabin handler isn't necessary, but it speeds things up.
 
 * Make sure to set actuallySendToSolr to 'true'
-* Decide whether or not to set `cleanOutSolr`; if true, the target Solr install will be completely emptied before indexing begins. So, you know, be careful. 
+* Decide whether or not to set `cleanOutSolr`; if true, the target Solr install will be completely emptied before indexing begins, to speed things up a bit. But, you know, be careful. 
 
 The logfile will again show you what's going on, including rough speeds.
 
@@ -208,7 +210,7 @@ It's possible to speed things up even more by using even more threads to do the 
 
 There are some issues with using `threach`:
 * `threach`, however, doesn't deal with thrown errors very well, so if you expect you'll have exceptions that aren't caught, you might end up with a silent deadlock and nothing to do but hit Ctrl-C. This is the big one.
-* The reported number of records indexed will almost certainly not match reality. Check your Solr admin panel for that. 
+* The reported number of records indexed will almost certainly not match reality -- check your Solr admin panel for that. I have no idea why the index from `threach`'s `#each_with_index` is always wrong, but I've tested and tested and tested and never seen the actually number of loops be incorrect (e.g., the correct number of MARC records always gets indexed). 
 
 Having said all that, I use `threach` in production with no problems; just program defensively.
 
