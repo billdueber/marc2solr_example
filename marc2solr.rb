@@ -27,9 +27,10 @@ end
 
 ## DEBUGGING STUFF ###
 
+benchmarkspecs = true # get timings for each of your solrFields. Only with useThreach == false!!!
 actuallySendToSolr = false # whether or not to communicate with solr
 ppMARC = false # Pretty print the MARC, so you can compare to the doc
-ppDoc  = true  # Pretty print the doc as it would be sent to solr
+ppDoc  = false  # Pretty print the doc as it would be sent to solr
 useThreach = false
 
 #### Solr config ####
@@ -224,22 +225,18 @@ end
 
 reader.send(method, *args) do |r, i|
   
-  doc = ss.doc_from_marc(r)
-  # If you've got super-custom routines (that don't get put in your index file),
-  # this is the spot for them.
-  #
-  # Do either
-  #   doc[fieldname] = value_or_array_of_values
-  # or
-  #   doc.merge! hash_of_fieldname_value_pairs
-
+  doc = ss.doc_from_marc(r, benchmarkspecs)
 
   # Send it to solr
   suss << doc if actuallySendToSolr
 
   # ...and/or STDOUT
   puts r if ppMARC
-  puts doc if ppDoc
+  if ppDoc
+    doc.keys.sort.each do |k|
+      puts [doc['id'][0], k, doc[k].sort.join(' | ')].join("\t")
+    end
+  end
   puts "\n--------------------------\n" if ppMARC or ppDoc
 
   # Throw a log line if it's time
@@ -258,6 +255,7 @@ if commitAtEnd and actuallySendToSolr
   $LOG.info "Final commit"
 end
 
+
 finalTime = Time.new
 $LOG.info "Finished"
 $LOG.info "Done. Waiting for HTTP Reader to time out or whatever it does"
@@ -267,3 +265,10 @@ $LOG.info "Finished at: " + finalTime.to_s
 
 $LOG.info "Total of #{i} records in " + '%.0f' % (finalTime.to_f - initialTime.to_f) + " seconds"
 $LOG.info '%.0f' % (i / (finalTime.to_f - initialTime.to_f)) + ' records/sec pace for the whole thing'
+
+if benchmarkspecs
+  ss.benchmarks.keys.sort{|a,b| ss.benchmarks[b].real <=> ss.benchmarks[a].real}.each do |k|
+    $LOG.info("%-20s %s" % [k + ':', ss.benchmarks[k].real.to_s])
+  end
+end
+

@@ -1,7 +1,6 @@
 {
  :maptype=>:multi,
  :mapname=>"location_map",
- :noMapKeyDefault => :passthrough,
  :map => [
    [/^BUHR.*/, "BUHR"],
    [/^MiAaUTR/, "UMTRI"],
