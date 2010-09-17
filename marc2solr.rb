@@ -30,7 +30,7 @@ end
 benchmarkspecs = true # get timings for each of your solrFields. Only with useThreach == false!!!
 actuallySendToSolr = false # whether or not to communicate with solr
 ppMARC = false # Pretty print the MARC, so you can compare to the doc
-ppDoc  = false  # Pretty print the doc as it would be sent to solr
+ppDoc  = true  # Pretty print the doc as it would be sent to solr
 useThreach = false
 
 #### Solr config ####
