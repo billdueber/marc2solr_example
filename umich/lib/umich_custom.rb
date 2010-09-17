@@ -144,49 +144,38 @@ module MARC2Solr
       def self.getHathiStuff doc, r
         defaultDate = '00000000'
         fields = r.find_by_tag('974')
+        
         h = {}
-        h['ht_id_display'] = []
-
-        ids = fields.map {|f| f.sub_values('u')}
-        ids.flatten!
-        ids.compact!
-        h['ht_id'] = ids
-
-        # The update dates are in the d
-        udates = fields.map {|f| f.sub_values('d')}
-        udates.flatten!
-        udates.compact!
-        udates.uniq!
-        if (udates.size > 0)
-          h['ht_id_update'] = udates
-        else
-          h['ht_id_update'] = defaultDate
-        end
-
-        # Join the u,d and z to get the diplay for each. 
-        fields.each do |f|
-          h['ht_id_display'] << [f['u'], f['d'] || defaultDate, f['z']].join("|")
-        end
-
-        # Now make the json 
-        # 
+        ids = []
+        udates = []
+        display = []
         jsonarr = []
+
+        
         fields.each do |f|
-          info  = {
-            'htid' => f['u'],
-            'ingest' => f['d'] || defaultDate       
+          id = f['u']
+          udate = f['d'] || defaultDate
+          
+          ids << id
+          udates << udate
+          display << [id, udate, f['z']].join("|")
+
+          # Build up the json
+          info = {
+            'htid' => id,
+            'ingest' => udate,
           }
           info['enumcron'] = f['z'] if f['z']
           info['rights'] = f['r'] if f['r']
           jsonarr << info
         end
 
-        h['ht_json'] = jsonarr.to_json
+        ids.uniq!
+        udates.uniq!
 
-        return [h['ht_id_display'], h['ht_id_update'], h['ht_id'], h['ht_json']]
+
+        return [display, udates, ids, jsonarr.to_json]
       end
-      
-      
       
     end
   end
