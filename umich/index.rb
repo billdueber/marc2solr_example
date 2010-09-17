@@ -123,6 +123,21 @@
   ["247", "x"],
  ]
 },
+
+# Can do this in dsl as:
+#  mapping = {
+#    'x' => [400, 410, 411, 440, ...]
+#    'z' => [556, 581, ...]
+#   'xz' => [534, 765, ...]
+# field('isn_related) do
+#   mapping.each_pair do |s, tags| do
+#     tags.each do |t|
+#       spec(t) {sub s}
+#     end
+#   end
+# end
+#  
+
 {
  :solrField=> "isn_related",
  :specs => [
