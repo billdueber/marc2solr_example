@@ -66,6 +66,10 @@ module MARC2Solr
       # For each title (245), extract the given codes, and then
       # return both that whole string and the the string with the
       # number of charactes indicated by ind2 (the "non-filing chars) removed.
+      #
+      # Could get more efficiency by passing data from title fields to each other down
+      # the line (maybe shave 2-3% off total processing time)
+      
       def self.getTitle(doc, r, codes)
         data = []
         fields = r.find_by_tag('245')
@@ -101,7 +105,7 @@ module MARC2Solr
         end
       end
       
-      
+            
       def self.getTitleSortable doc, r, codes
         f = r['245'] # only the first one!
         subvals = f.sub_values(codes)
@@ -133,7 +137,7 @@ module MARC2Solr
         end
       end
       
-      def self.publishDateRage(doc,r)
+      def self.publishDateRange(doc,r)
         pubdate = doc['publishDate']
         return [] unless pubdate and pubdate.size > 0
         return self.getDateRange pubdate[0], r
