@@ -48,7 +48,7 @@ end
 # by name
 #
 # Entries that don't appear in the map are ignored (but see below for
-# :noMapKeyDefault)
+# :mapMissDefault)
 #
 # Note that a default value *is not mapped*. It's just returned
 # as-is
@@ -77,20 +77,20 @@ end
 field('country_nomapkey') do
   default '(Not specified)'
   mapname 'country_map'
-  noMapKeyDefault '(Unknown country code)'
+  mapMissDefault '(Unknown country code)'
   spec(008) {chars 15..17}
   spec(008) {char 17}
   spec(752) {subs 'ab'}
 end
 
-# As an extra bonus, if you specify :noMapKeyDefault => :passthrough,
+# As an extra bonus, if you specify :mapMissDefault => :passthrough,
 # the un-mappable value will just be passed through. If there is a mappable
 # value, then whatever is retuned from the map will go through 
 
 field('country_passthrough') do
   default '(Not specified)'
   mapname 'country_map'
-  noMapKeyDefault '(Unknown country code)'
+  mapMissDefault '(Unknown country code)'
   spec(008) {chars 15..17}
   spec(008) {char 17}
   spec(752) {subs 'ab'}
@@ -106,7 +106,7 @@ end
 # directory for some very simple examples
 #
 # Note that you can, if you'd like, use a map, default value, and
-# noMapKeyDefault for a custom function just as you would for a
+# mapMissDefault for a custom function just as you would for a
 # regular one.
 
 custom('fullrecord_as_xml') do

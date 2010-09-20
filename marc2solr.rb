@@ -1,10 +1,10 @@
 $KCODE = 'utf8'
 initialTime  = Time.new
 require 'rubygems'
-require 'threach'
-require 'marcspec'
-require 'marc4j4r'
-require 'jruby_streaming_update_solr_server'
+gem 'threach'
+gem 'marcspec', ">= 1.5.0"
+gem 'marc4j4r'
+gem 'jruby_streaming_update_solr_server'
 
 require 'logger'
 require 'pp'
@@ -27,7 +27,7 @@ end
 
 ## DEBUGGING STUFF ###
 
-benchmarkspecs = true # get timings for each of your solrFields. Only with useThreach == false!!!
+benchmarkspecs = false # get timings for each of your solrFields. Only with useThreach == false!!!
 actuallySendToSolr = false # whether or not to communicate with solr
 ppMARC = false # Pretty print the MARC, so you can compare to the doc
 ppDoc  = true  # Pretty print the doc as it would be sent to solr
@@ -51,7 +51,8 @@ commitAtEnd = true
 
 # Derive the rest
 loadAllFilesIn = ["#{baseDir}/lib"] # for custom code
-specfile = "#{baseDir}/index.rb"
+# specfile = "#{baseDir}/index.rb"
+specfile = "#{baseDir}/index.dsl"
 translationMapsDir = "#{baseDir}/translation_maps"
 
 
@@ -68,8 +69,8 @@ logfilename = File.basename(marcfile).split(/\./)[0] + '-' + Time.new.strftime('
 marcfileextension  = File.basename(marcfile).split(/\./)[-1]
 $LOG = Logger.new(logfilename)
 $LOG.datetime_format = '%Y%m%d %H:%M:%S'
-# $LOG.level = Logger::DEBUG
-$LOG.level = Logger::INFO 
+$LOG.level = Logger::DEBUG
+# $LOG.level = Logger::INFO 
 logBatchSize = 1000
 
 $stderr.sync = true
@@ -136,30 +137,36 @@ ss = MARCSpec::SpecSet.new
 
 ss.loadMapsFromDir translationMapsDir
 
+ss.buildSpecsFromDSLFile(specfile)
+
+$LOG = Logger.new(logfilename)
+$LOG.datetime_format = '%Y%m%d %H:%M:%S'
+$LOG.level = Logger::DEBUG
+# $LOG.level = Logger::INFO 
 
 
 # Get the list of specs and load them up. We differentiate a custom routine
 # because it has a :module defined
 
-speclist = eval(File.open(specfile).read)
-speclist.each do |spechash|
-  if spechash[:module]
-    solrspec = MARCSpec::CustomSolrSpec.fromHash(spechash)
-  else
-    solrspec = MARCSpec::SolrFieldSpec.fromHash(spechash)
-  end
-  if spechash[:mapname]
-    map = ss.map(spechash[:mapname])
-    unless map
-      $LOG.error "  Cannot find map #{spechash[:mapname]} for field #{spechash[:solrField]}"
-    else
-      $LOG.debug "  Found map #{spechash[:mapname]} for field #{spechash[:solrField]}"
-      solrspec.map = map
-    end
-  end
-  ss.add_spec solrspec
-  $LOG.debug "Added spec #{solrspec.solrField}"
-end
+# speclist = eval(File.open(specfile).read)
+# speclist.each do |spechash|
+#   if spechash[:module]
+#     solrspec = MARCSpec::CustomSolrSpec.fromHash(spechash)
+#   else
+#     solrspec = MARCSpec::SolrFieldSpec.fromHash(spechash)
+#   end
+#   if spechash[:mapname]
+#     map = ss.map(spechash[:mapname])
+#     unless map
+#       $LOG.error "  Cannot find map #{spechash[:mapname]} for field #{spechash[:solrField]}"
+#     else
+#       $LOG.debug "  Found map #{spechash[:mapname]} for field #{spechash[:solrField]}"
+#       solrspec.map = map
+#     end
+#   end
+#   ss.add_spec solrspec
+#   $LOG.debug "Added spec #{solrspec.solrField}"
+# end
 
 $LOG.info "Added #{ss.solrfieldspecs.size} specs"
 
@@ -224,9 +231,7 @@ else
 end
 
 reader.send(method, *args) do |r, i|
-  
   doc = ss.doc_from_marc(r, benchmarkspecs)
-
   # Send it to solr
   suss << doc if actuallySendToSolr
 
@@ -234,12 +239,13 @@ reader.send(method, *args) do |r, i|
   puts r if ppMARC
   if ppDoc
     doc.keys.sort.each do |k|
-      puts [doc['id'][0], k, doc[k].sort.join(' | ')].join("\t")
+      puts [doc['id'][0], k, doc[k].sort.join('^')].join("\t")
     end
   end
-  puts "\n--------------------------\n" if ppMARC or ppDoc
+  # puts "\n--------------------------\n" if ppMARC or ppDoc
 
   # Throw a log line if it's time
+  
   if (i % logBatchSize == 0)
     curtime = Time.new
     secs  = '%.1f' % (curtime.to_f - prevTime.to_f)
