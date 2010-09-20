@@ -89,11 +89,19 @@ File.open(propfile) do |fh|
     
     # Leave comments alone
     if line =~ /^#/
-      puts line
+      # puts line
       next
     end
     
     fieldname,spec = line.split(/\s*=\s*/)
+    
+    # Deal with constants
+    if spec =~ /^"(.+)"\s*$/
+      constant = $1
+      csf = MARCSpec::ConstantSolrSpec.new(:solrField=>fieldname, :constantValue=>constant)
+      ss << csf
+      next
+    end
     
     # Deal with built-in functions if we can
     if spec == 'FullRecordAsXML'
@@ -132,7 +140,7 @@ File.open(propfile) do |fh|
       next
     end
     
-    # Log and ignore custom fields
+    # Log and ignore other custom fields
     if spec =~ /^custom/
       $LOG.warn "Skipping custom line #{line}"
       next
@@ -140,7 +148,7 @@ File.open(propfile) do |fh|
     
       
       
-    
+    #otherwise, build one from scratch
     
     sfs = MARCSpec::SolrFieldSpec.new(:solrField => fieldname)
     
@@ -174,7 +182,7 @@ File.open(propfile) do |fh|
       end
     end # marcfields.split
     
-    # Add in the specials
+    # Add in the specials -- "first", maps, etc.
     specials.each do |special|
       case special
       when 'first'
@@ -219,10 +227,9 @@ end
 
 File.open("#{newdir}/#{newpropfile}", 'w') do |f|
   $LOG.debug "Writing out spec file #{newpropfile}"
-  f.puts '['
   ss.solrfieldspecs.each do |sfs|
-    f.puts sfs.asPPString + ','
+    f.puts sfs.asDSLString
+    f.puts ''
   end
-  f.puts ']'
 end
 
