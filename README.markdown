@@ -8,7 +8,7 @@ It relies on [jruby](http://jruby.org/) to pull it all together; this will not r
 
 ## VERSION
 
-0.4.1
+0.5.0
 
 Consider this a *beta* -- things are pretty settled down, but some parts of the interface (as represented by marcspec) may still change. Announcements of updates to this code and the libraries that underly it will be made at [my blog](http://robotlibrarian.billdueber.com/).
 
@@ -98,7 +98,7 @@ In this case, you can run
 The results will be:
 
 * Creation of `/my/new/dir`
-* Translation, as much as possible, of `umich_index.properties` into `index.rb`
+* Translation, as much as possible, of `umich_index.properties` into `index.dsl`
 * Translation of all the translation maps
 * Creation of a 'fromSolrmarc.log' file in `/my/new/dir` that shows what you need to do by hand.
 
@@ -108,7 +108,7 @@ Check out `fromSolrmarc.log` to see what the translator was unable to move over.
 
 The real work of loading the index and translation maps is done `marcspec`. The [[marcspec wiki|http://github.com/billdueber/marcspec/wiki/]] has more information about the config files and all the options, but first look at the samples files in the `simple_sample` directory. Those simple examples will get you 98% of they way there.
 
-### Create your own index.rb and translation files (eventually)
+### Create/Edit your own index.dsl and translation files (eventually)
 
 The format for these files is explained pretty well in the appropriate files 
 within `simple_sample`. Start there, and send any questions to me so I can improve the docs.
@@ -118,7 +118,7 @@ within `simple_sample`. Start there, and send any questions to me so I can impro
 
 **Note**: The real documentation for Custom Functions is in the [[marcspec wiki|http://github.com/billdueber/marcspec/wiki/]]. This is just a simple example.
 
-There are a small handful of custom functions in `lib/marc2Solr_custom.rb` (basically, just the ones I was using), which is copied into the `lib/` directory when you run `fromSolrmarc.rb`, too. You can see how to apply them by looking at `simple_sample/index.rb` and how to write them by looking at `simiple_sample/lib/marc2Solr_custom.rb`. Even more can be seen in the umich code, which is what we use on our live system.
+There are a small handful of custom functions in `lib/marc2Solr_custom.rb` (basically, just the ones I was using), which is copied into the `lib/` directory when you run `fromSolrmarc.rb`, too. You can see how to apply them by looking at `simple_sample/index.dsl` and how to write them by looking at `simiple_sample/lib/marc2Solr_custom.rb`. Even more can be seen in the umich code, which is what we use on our live system.
 
 To create your own custom functions, create a module and provide module-level function (again, see the example file in `lib/`). A custom routine specification just gives the module, method name (as a symbol), and optional arguments to pass besides the mid-construction document (a hashlike) and the MARC4J4R::Record object. 
 
@@ -140,14 +140,16 @@ A simple custom routine looks like this:
     end
 
 
-...and is called via a spec like this:
+...and is called in a config file like this
 
-    {
-      :solrField => myField,
-      :module => MARC2Solr::Custom::WhatzamattaU,
-      :functionSymbol => :doSomethingCustom,
-      :functionArgs => ['the first arg', 'the second arg']
+```ruby
+  custom('myField') do
+    function(:doSomethingCustom) {
+      mod MARC2Solr::Custom::WhatzamattaU
+      args 'the first arg', 'the second arg'
     }
+  end
+```
     
 You can see that the module function (note that it's defined via `self.functionName`) will always have at least two arguments (`doc` and `record`), plus whatever you need to have passed in to do the work. When the system makes the call, you grab what you need from the document and the record and return an array of values. 
 
@@ -157,7 +159,7 @@ Again the [[marcspec wiki|http://github.com/billdueber/marcspec/wiki/Custom-Func
 
 ## Running to debug
 
-Right now, the configuration above and beyond what's in the index and translation maps (e.g., where Solr is, how many threads to use, what kind of MARC file to expect) is just inlined at the top of the `marc2Solr.rb` file; this will have to change at some point. Opinions about what the config file should hold and/or look like are welcome, as are ideas about a DSL for the whole index.rb configuration.
+Right now, the configuration above and beyond what's in the index and translation maps (e.g., where Solr is, how many threads to use, what kind of MARC file to expect) is just inlined at the top of the `marc2Solr.rb` file; this will have to change at some point. Opinions about what the config file should hold and/or look like are welcome, as are ideas about a DSL for the whole index.dsl configuration.
 
 ### Edit the marc2Solr.rb file
 
@@ -171,7 +173,7 @@ None of those options are mutually exclusive; you can push to Solr and STDOUT at
 
 In any case, assuming you haven't messed with anything, go ahead and run
 
-    jruby marc2Solr.rb /path/to/marcfile.mrc /dir/containing/index.rb > out.txt &
+    jruby marc2Solr.rb /path/to/marcfile.mrc /dir/containing/index.dsl > out.txt &
 
 ...e.g.,
 
@@ -215,21 +217,26 @@ There are some issues with using `threach`:
 Having said all that, I use `threach` in production with no problems; just program defensively.
 
 # CHANGES
+0.5.0
+* Started using DSL for everything.
+* Change the default doc output_to_stdout format to be easier to compare file-to-file.
+
 0.4.1
-: Stop using Bundler; it messes up trying to include custom code in your `lib` directory.
+* Stop using Bundler; it messes up trying to include custom code in your `lib` directory.
 
 0.4
-:  Update marcspec version requirement to 0.7; this changes the configuration
-   for a custom function to indicate what module function with the key   :functionSymbol (instead of the former :moduleSymbol). It's a module function, not any sort of method. 
+* Update marcspec version requirement to 0.7; this changes the configuration
+   for a custom function to indicate what module function with the key   * 
+* functionSymbol (instead of the former :moduleSymbol). It's a module function, not any sort of method. 
    
 0.3
-:  Updated marcspec requirement to allow custom functions to return values for
+* Updated marcspec requirement to allow custom functions to return values for
    multiple solr fields simultaneously, and added example to 
    `simple_sample/index.rb` and `simple_sample/lib/marc2solr_custom.rb`
    
 0.2
-:  Added VERSION file and this CHANGES section
-:  Update to use MARCSpec v0.4, which changes the signature of custom 
+* Added VERSION file and this CHANGES section
+* Update to use MARCSpec v0.4, which changes the signature of custom 
    functions. Instead of` (record, your,args)`, it's now `(doc, record, your, 
    args)`, where `doc` is a hashlike that contains the already-computed 
    fields. This allows you access to stuff you've already done in subsequent 
@@ -237,4 +244,4 @@ Having said all that, I use `threach` in production with no problems; just progr
    influence setting -- or not -- the `serialTitle` field).
 
 0.1
-:  First public release
+* First public release

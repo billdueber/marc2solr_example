@@ -51,8 +51,7 @@ end
 
 propfiledir = File.dirname(propfile)
 trmapdir = propfiledir + '/translation_maps'
-# newpropfile = File.basename(propfile, '.properties') + '.rb'
-newpropfile = 'index.rb'
+newpropfile = 'index.dsl'
 
 
 
@@ -209,6 +208,15 @@ ss.tmaps.each do |name, map|
 end
 
 # Now the solrspecs
+# File.open("#{newdir}/#{newpropfile}", 'w') do |f|
+#   $LOG.debug "Writing out spec file #{newpropfile}"
+#   f.puts '['
+#   ss.solrfieldspecs.each do |sfs|
+#     f.puts sfs.asPPString + ','
+#   end
+#   f.puts ']'
+# end
+
 File.open("#{newdir}/#{newpropfile}", 'w') do |f|
   $LOG.debug "Writing out spec file #{newpropfile}"
   f.puts '['
