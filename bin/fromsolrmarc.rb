@@ -87,7 +87,13 @@ File.open(propfile) do |fh|
   fh.each_line do |line|
     next unless line =~ /\S/
     line.strip!
-    next if line =~ /^#/
+    
+    # Leave comments alone
+    if line =~ /^#/
+      puts line
+      next
+    end
+    
     fieldname,spec = line.split(/\s*=\s*/)
     
     # Deal with built-in functions if we can
