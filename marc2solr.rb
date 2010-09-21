@@ -67,10 +67,14 @@ solrdocQueueSize = 64
 
 logfilename = File.basename(marcfile).split(/\./)[0] + '-' + Time.new.strftime('%Y%m%d-%H%M%S') + '.log'
 marcfileextension  = File.basename(marcfile).split(/\./)[-1]
-$LOG = Logger.new(logfilename)
-$LOG.datetime_format = '%Y%m%d %H:%M:%S'
-$LOG.level = Logger::DEBUG
-# $LOG.level = Logger::INFO 
+
+if marcfileextension == 'gz'
+  marcfileextension  = File.basename(marcfile).split(/\./)[-2]
+  gzipped = true
+end
+
+# loglevel = Logger::DEBUG
+loglevel = Logger::INFO 
 logBatchSize = 1000
 
 $stderr.sync = true
@@ -103,6 +107,12 @@ defaultEncoding = nil # let it guess
 ####################################################################################
 
 # Check to make sure we can get the specfile and the marc file
+
+
+$LOG = Logger.new(logfilename)
+$LOG.datetime_format = '%Y%m%d %H:%M:%S'
+$LOG.level = loglevel
+
 
 $LOG.info "Checking files"
 unless File.readable? specfile
@@ -145,28 +155,6 @@ $LOG.level = Logger::DEBUG
 # $LOG.level = Logger::INFO 
 
 
-# Get the list of specs and load them up. We differentiate a custom routine
-# because it has a :module defined
-
-# speclist = eval(File.open(specfile).read)
-# speclist.each do |spechash|
-#   if spechash[:module]
-#     solrspec = MARCSpec::CustomSolrSpec.fromHash(spechash)
-#   else
-#     solrspec = MARCSpec::SolrFieldSpec.fromHash(spechash)
-#   end
-#   if spechash[:mapname]
-#     map = ss.map(spechash[:mapname])
-#     unless map
-#       $LOG.error "  Cannot find map #{spechash[:mapname]} for field #{spechash[:solrField]}"
-#     else
-#       $LOG.debug "  Found map #{spechash[:mapname]} for field #{spechash[:solrField]}"
-#       solrspec.map = map
-#     end
-#   end
-#   ss.add_spec solrspec
-#   $LOG.debug "Added spec #{solrspec.solrField}"
-# end
 
 $LOG.info "Added #{ss.solrfieldspecs.size} specs"
 
@@ -193,10 +181,13 @@ if readerType == :figureOutByExtension
     typeOfReader = :permissivemarc
   end
 end
-    
-  
 
-reader = MARC4J4R::Reader.new(marcfile, typeOfReader, defaultEncoding)
+source = marcfile
+if gzipped
+  source = Java::java.util.zip.GZIPInputStream.new(IOConvert.byteinstream(marcfile))
+end
+
+reader = MARC4J4R::Reader.new(source, typeOfReader, defaultEncoding)
 
 $LOG.info "Got the reader"
 ## Clear things out if requested, and it's not a dry run
