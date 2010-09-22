@@ -14,21 +14,21 @@ newdir = ARGV[1]
 
 
 # First, try to create the new directory structure
-libdir = File.dirname(__FILE__).split('/')[0..-2]
-if libdir.size == 0
-  libdir = 'lib'
+customdir = File.dirname(__FILE__).split('/')[0..-2]
+if customdir.size == 0
+  customdir = 'lib'
 else
-  libdir = libdir.join('/') + '/lib'
+  customdir = customdir.join('/') + '/lib'
 end
 
-Dir.glob("#{libdir}/*") do |f|
+Dir.glob("#{customdir}/*") do |f|
   require f
 end
 
 begin
   FileUtils.mkdir_p "#{newdir}/translation_maps"
   FileUtils.mkdir "#{newdir}/lib"
-  Dir.glob("#{libdir}/*").each do |f|
+  Dir.glob("#{customdir}/*").each do |f|
     FileUtils.cp f, "#{newdir}/lib/"
   end
 rescue Exception => e
