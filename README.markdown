@@ -28,10 +28,11 @@ Consider this a *beta* -- things are pretty settled down, but some parts of the 
 * It's JRuby, not java (although you can use java code in JRuby if you'd like), which may make adding custom field functions easier depending on your comfort level with ruby vs java.
 * It talks to Solr via http, not by directly munging the lucene indexes. This allows you to do things like run updates against a live index if you'd like, or run the indexing code on a separate machine than your Solr install.
 * Configuration is just Ruby files, so you could (in theory) do fancy stuff in there. The tradeoff is that the syntax is pickier. 
+* If your solrmarc custom functions are written without reliance on other parts of solrmarc, you can easily use them from JRuby by throwing a .jar into the lib/ subdirectory of your configuration.
 
 ## How is this better (in my opinion) than Solrmarc
 * Values in translation maps can be arrays of values, not just scalars
-* A single custom function can return values for multiple Solr fields simultaneously. 
+* A single custom function can return values for multiple Solr fields simultaneously, grab stuff out of the doc that's already been produced, or dump stuff into a temporary cache in the record object to make it available for yet-to-be-called functions.
 * It allows repeated solr field names (so values can come from multiple custom fields, if need be) and gives custom fields access to previously-computed values (so you don't need to re-do expensive work in many cases)
 * You can easily multithread (with some caveats). With a single thread, it'll likely be a little slower. If you ramp it up with `threach`, it'll likely be a little faster (I'd *love* to hear from people about this).
 
