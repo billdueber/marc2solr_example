@@ -187,6 +187,8 @@ if gzipped
   source = Java::java.util.zip.GZIPInputStream.new(IOConvert.byteinstream(marcfile))
 end
 
+puts "Source is #{source.inspect}"
+
 reader = MARC4J4R::Reader.new(source, typeOfReader, defaultEncoding)
 
 $LOG.info "Got the reader"

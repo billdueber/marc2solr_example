@@ -23,7 +23,9 @@
  [/^MiFliC/, "Flint Thompson Library"],
  [/^SOC.*/, "Social Work"],
  [/^SCI.*/, "Shapiro Science"],
+ [/^DHC.*/, "Donald Hall Collection"],
  [/^PUB.*/, "Public Health"],
+ [/^UNION.*/, "Michigan Union"],
  [/^MUSM.*/, "Museums"],
  [/^HATCH MSOFT/, "Hatcher Graduate Map Library"],
  [/^MUSIC.*/, "Music"],
@@ -48,9 +50,6 @@
  [/^HATCH DREF/, "Hatcher Graduate Documents Center"],
  [/^HATCH DOCS/, "Hatcher Graduate Documents Center"],
  [/^HATCH DMIC/, "Hatcher Graduate Documents Center"],
- [/^HATCH DFILE/, "Hatcher Graduate Documents Center"],
- [/^DHC/, "Donald Hall Collection"]
- 
-]
+ [/^HATCH DFILE/, "Hatcher Graduate Documents Center"]]
 
 }
