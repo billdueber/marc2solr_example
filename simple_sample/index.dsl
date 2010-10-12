@@ -13,25 +13,26 @@ end
 # For variable fields, we specify the tag and one or more subfields to get
 
 field('shorttitle') do
-  spec(245) { 
-    subs 'ab'
-  }
+  spec('245ab')
 end
 
+# You can also put the subfield definitions in a block; this is useful if you 
+# want to generated the list of subfields algorithmically
+
 field('lccn') do
-  spec(010) {sub 'a'} # one line is fine if you like
+  spec('010') {sub 'a'} # one line is fine if you like
 end
 
 # For controlfieds, we support substrings, either by index (17) or
 # range (15..17).
 #
-# Here, we also see taking just a couple subfields of the 752; they'll appear
-# separated by spaces
+# Here, we also see taking just a couple subfields of the 752 as a single string.
+# The one result will just be the two strings separated by spaces
 
 field('country_code') do
-  spec(008) {chars 15..17}
-  spec(008) {char 17}
-  spec(752) {subs 'ab'}
+  spec('008') {chars 15..17}
+  spec('008') {char 17}
+  spec('752ab')
   # spec(752) {sub ['a', 'b']} # could also use array
 end
 
@@ -40,7 +41,7 @@ end
 
 field('genre') do
   default "(No genre)"
-  spec(665) {subs 'ab'}
+  spec('665ab')
 end
 
 # We can use a translation map to turn raw data into user-friendly data
@@ -60,11 +61,11 @@ end
 field('country_of_pub') do
   default '(No country)'
   mapname 'country_map'
-  spec(008) {
+  spec('008') {
     chars 15..17
     char  17
   }
-  spec(752) {subs 'ab'}
+  spec('752ab')
 end
 
 # And, to round out our possible default options, it's also 
@@ -78,9 +79,9 @@ field('country_nomapkey') do
   default '(Not specified)'
   mapname 'country_map'
   mapMissDefault '(Unknown country code)'
-  spec(008) {chars 15..17}
-  spec(008) {char 17}
-  spec(752) {subs 'ab'}
+  spec('008') {chars 15..17}
+  spec('008') {char 17}
+  spec('752ab')
 end
 
 # As an extra bonus, if you specify :mapMissDefault => :passthrough,
@@ -90,10 +91,10 @@ end
 field('country_passthrough') do
   default '(Not specified)'
   mapname 'country_map'
-  mapMissDefault '(Unknown country code)'
-  spec(008) {chars 15..17}
-  spec(008) {char 17}
-  spec(752) {subs 'ab'}
+  mapMissDefault :passthrough
+  spec('008') {chars 15..17}
+  spec('008') {char 17}
+  spec('752ab')
 end
 
 # And, finally, you can create custom functions.
@@ -145,15 +146,15 @@ end
 # 'title' field like so (in a not-very-efficient way):
 
 field('title') do
-  spec(245) # the whole thing
-  spec(245) {
+  spec('245') # the whole thing
+  spec('245') {
     subs 'ab'  # just the ab
     sub  'a'   # just the a
   }
 end
 
 custom('title') do
-  function(:filedWithoutIndexingChars) {
+  function(:fieldWithoutIndexingChars) {
     mod MARC2Solr::Custom
     args '245'
   }
@@ -165,8 +166,8 @@ end
 #
 # Note in this case that a map, default value, etc. make no sense and are unallowed.
 
-custom(['pubDate'], ['pubDateRange']) do
-  function(:putDateAndRange) {
+custom(['pubDate','pubDateRange']) do
+  function(:pubDateAndRange) {
     mod MARC2Solr::Custom
   }
 end

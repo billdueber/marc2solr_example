@@ -1,7 +1,9 @@
 {
  :maptype=>:multi,
  :mapname=>"location_map",
- :map => [[/^SPEC RCLC/, "SPEC CHIL"],
+ :map => [
+ [/^(.*)/, Proc.new {|m| m[1]}],
+ [/^SPEC RCLC/, "SPEC CHIL"],
  [/^SPEC GOSL/, "SPEC CHIL"],
  [/^SPEC CHIL.*/, "SPEC CHIL"],
  [/^SPEC LA.*/, "SPEC LABD"],
@@ -27,7 +29,6 @@
  [/^HATCH MATL/, "HATCH BKS"],
  [/^HATCH GRNT/, "HATCH REF"],
  [/^HATCH GLRF/, "HATCH REF"],
- [/^(.*)/, "$1"],
  [/^HATCH GDESK/, "HATCH REF"],
  [/^FLINT TECH/, "FLINT REF"],
  [/^HATCH DSOFT/, "HATCH DOCS"],

@@ -9,13 +9,17 @@
 # String === String
 #
 # As a special case, if the key is a pattern, the "value" can be a Proc object that gets passed one argument --
-# the MatchObject produced by the /thekey/.match(passed_in_value) match operation. 
+# the MatchObject produced by a /thekey/.match(passed_in_value) match operation. 
 # 
 # Something like:
 #
 #   [/(.+?)\s+Library/, Proc.new {|m| m[1]}], # Get the string before "Library"
 #   [/.*/, Proc.new{|m| m[0]}] # Get whatever was passed in; kind of like :noMapKeyDefault, but the
-#         #argument gets passed through *in addition to* any other matches.
+#                              # argument gets passed through *in addition to* any other matches.
+#
+# This could, of course, be used as a poor-man's postprocessor, but most of the use cases for such
+# are better off being done in schema.xml, and in any case I think I'm gonna add a post-processor
+# hook for real.
 #
 # See the [[marcspec wiki|http://github.com/billdueber/marcspec/wiki/]]
 # for more details.

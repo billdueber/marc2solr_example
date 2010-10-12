@@ -37,35 +37,35 @@ end
 
 field("format") do
   mapname 'format_map_umich'
-  spec('970') {sub 'a'}
+  spec("970a")
 end
 
 field("availability") do
   mapname "availability_map_umich"
-  spec("973") {sub 'b'}
+  spec("973b")
 end
 
 field("cat_date") do
-  spec("972") {sub 'c'}
+  spec("972c")
 end
 
 #### INSTITUTION / LOCATION ####
 
 field("institution") do
   mapname "institution_map"
-  spec("971") {sub 'a'}
+  spec("971a")
 end
 
 field("building") do
   mapname "library_map"
-  spec("852") {sub 'bc'}
-  spec("971") {sub 'a'}
+  spec("852bc")
+  spec("971a")
 end
 
 field('location') do
   mapname "location_map"
   mapMissDefault :passthrough
-  spec("971") {sub 'a'}
+  spec("971a")
   spec("852") {
     sub 'b'
     sub 'bc'
@@ -77,11 +77,11 @@ end
 ################################
 
 field('lccn') do
-  spec('010') {sub 'a'}
+  spec("010a")
 end
 
 field('rptnum') do
-  spec("088") {sub 'a'}
+  spec("088a")
 end
 
 custom('oclc') do
@@ -113,46 +113,44 @@ field('issn') do
     sub 'y'
     sub 'z'
   }
-  spec(247) {
-    sub 'x'
-  }
+  spec('247x')
 end
 
 
 field('isn_related') do
-  spec("400") {subs "x"}
-  spec("410") {subs "x"}
-  spec("411") {subs "x"}
-  spec("440") {subs "x"}
-  spec("490") {subs "x"}
-  spec("500") {subs "x"}
-  spec("510") {subs "x"}
-  spec("534") {subs "xz"}
-  spec("556") {subs "z"}
-  spec("581") {subs "z"}
-  spec("700") {subs "x"}
-  spec("710") {subs "x"}
-  spec("711") {subs "x"}
-  spec("730") {subs "x"}
-  spec("760") {subs "x"}
-  spec("762") {subs "x"}
-  spec("765") {subs "xz"}
-  spec("767") {subs "xz"}
-  spec("770") {subs "xz"}
-  spec("772") {subs "x"}
-  spec("773") {subs "xz"}
-  spec("774") {subs "xz"}
-  spec("775") {subs "xz"}
-  spec("776") {subs "xz"}
-  spec("777") {subs "x"}
-  spec("780") {subs "xz"}
-  spec("785") {subs "xz"}
-  spec("786") {subs "xz"}
-  spec("787") {subs "xz"}
+  spec("400x")
+  spec("410x")
+  spec("411x")
+  spec("440x")
+  spec("490x")
+  spec("500x")
+  spec("510x")
+  spec("534xz")
+  spec("556z")
+  spec("581z")
+  spec("700x")
+  spec("710x")
+  spec("711x")
+  spec("730x")
+  spec("760x")
+  spec("762x")
+  spec("765xz")
+  spec("767xz")
+  spec("770xz")
+  spec("772x")
+  spec("773xz")
+  spec("774xz")
+  spec("775xz")
+  spec("776xz")
+  spec("777x")
+  spec("780xz")
+  spec("785xz")
+  spec("786xz")
+  spec("787xz")
 end
 
 field('callnumber') do
-  spec("852") { subs 'hij'}
+  spec("852hij")
 end
 
 field('sudoc') do
@@ -167,44 +165,44 @@ end
 ################################
 
 field('author') do
-  spec("100") {sub 'abcd'}
-  spec("110") {sub 'abcd'}
-  spec("111") {sub 'abc'}
+  spec("100abcd")
+  spec("110abcd")
+  spec("111abc")
 end
 
 field('author2') do
-  spec("110") {sub 'ab'}
-  spec("111") {sub 'ab'}
-  spec("700") {sub 'abcd'}
-  spec("710") {sub 'ab'}
-  spec("711") {sub 'ab'}
+  spec("110ab")
+  spec("111ab")
+  spec("700abcd")
+  spec("710ab")
+  spec("711ab")
 end
 
 field("author_top") do
-  spec("100") {subs "abcdefgjklnpqtu0"}
-  spec("110") {subs "abcdefgklnptu04"}
-  spec("111") {subs "acdefgjklnpqtu04"}
-  spec("700") {subs "abcdejqux034"}
-  spec("710") {subs "abcdeux034"}
-  spec("711") {subs "acdegjnqux034"}
-  spec("720") {sub "a"}
-  spec("765") {sub "a"}
-  spec("767") {sub "a"}
-  spec("770") {sub "a"}
-  spec("772") {sub "a"}
-  spec("774") {sub "a"}
-  spec("775") {sub "a"}
-  spec("776") {sub "a"}
-  spec("777") {sub "a"}
-  spec("780") {sub "a"}
-  spec("785") {sub "a"}
-  spec("786") {sub "a"}
-  spec("787") {sub "a"}
-  spec("245") {sub "c"}
+  spec("100abcdefgjklnpqtu0")
+  spec("110abcdefgklnptu04")
+  spec("111acdefgjklnpqtu04")
+  spec("700abcdejqux034")
+  spec("710abcdeux034")
+  spec("711acdegjnqux034")
+  spec("720a")
+  spec("765a")
+  spec("767a")
+  spec("770a")
+  spec("772a")
+  spec("774a")
+  spec("775a")
+  spec("776a")
+  spec("777a")
+  spec("780a")
+  spec("785a")
+  spec("786a")
+  spec("787a")
+  spec("245c")
 end
 
 field("author_rest") do
-  spec("505") {sub 'r'}
+  spec("505r")
 end
 
 ################################
@@ -243,50 +241,50 @@ custom('titleSort') do
 end  
 
 field('title_top') do
-  spec("240") {subs 'adfghklmnoprs0'}
-  spec("245") {subs 'abfghknps'}
-  spec("111") {subs 'acdefgjklnpqtu04'}
-  spec("130") {subs 'adfghklmnoprst0'}
+  spec("240adfghklmnoprs0")
+  spec("245abfghknps")
+  spec("111acdefgjklnpqtu04")
+  spec("130adfghklmnoprst0")
 end
 
 field('title_rest') do
-  spec("210") {subs "ab"}
-  spec("222") {subs "ab"}
-  spec("242") {subs "abhnpy"}
-  spec("243") {subs "adfghklmnoprs"}
-  spec("246") {subs "abdenp"}
-  spec("247") {subs "abdenp"}
-  spec("700") {subs "fghjklmnoprstx03"}
-  spec("710") {subs "fghklmnoprstx03"}
-  spec("711") {subs "acdefghjklnpqstux034"}
-  spec("730") {subs "adfghklmnoprstx03"}
-  spec("740") {subs "ahnp"}
-  spec("765") {subs "st"}
-  spec("767") {subs "st"}
-  spec("770") {subs "st"}
-  spec("772") {subs "st"}
-  spec("773") {subs "st"}
-  spec("775") {subs "st"}
-  spec("776") {subs "st"}
-  spec("777") {subs "st"}
-  spec("780") {subs "st"}
-  spec("785") {subs "st"}
-  spec("786") {subs "st"}
-  spec("787") {subs "st"}
-  spec("830") {subs "adfghklmnoprstv"}
-  spec("440") {subs "anpvx"}
-  spec("490") {subs "avx"}
-  spec("505") {subs "t"}
+  spec("210ab")
+  spec("222ab")
+  spec("242abhnpy")
+  spec("243adfghklmnoprs")
+  spec("246abdenp")
+  spec("247abdenp")
+  spec("700fghjklmnoprstx03")
+  spec("710fghklmnoprstx03")
+  spec("711acdefghjklnpqstux034")
+  spec("730adfghklmnoprstx03")
+  spec("740ahnp")
+  spec("765st")
+  spec("767st")
+  spec("770st")
+  spec("772st")
+  spec("773st")
+  spec("775st")
+  spec("776st")
+  spec("777st")
+  spec("780st")
+  spec("785st")
+  spec("786st")
+  spec("787st")
+  spec("830adfghklmnoprstv")
+  spec("440anpvx")
+  spec("490avx")
+  spec("505t")
 end
 
 field('series') do
-  spec("440") {subs "ap"}
-  spec("800") {subs "abcdfpqt"}
-  spec("830") {subs "ap"}
+  spec("440ap")
+  spec("800abcdfpqt")
+  spec("830ap")
 end
 
 field('series2') do
-  spec("490") {sub 'a'}
+  spec("490a")
 end
 
 # Serial titles count on the format alreayd being set and having the string 'Serial' in it.
@@ -323,33 +321,33 @@ end
 ################################
 
 field('topic') do
-  spec("600") {subs "abcdefghjklmnopqrstuvxyz"}
-  spec("600") {subs "a"}
-  spec("610") {subs "abcdefghklmnoprstuvxyz"}
-  spec("610") {subs "a"}
-  spec("611") {subs "acdefghjklnpqstuvxyz"}
-  spec("611") {subs "a"}
-  spec("630") {subs "adefghklmnoprstvxyz"}
-  spec("630") {subs "a"}
-  spec("648") {subs "avxyz"}
-  spec("648") {subs "a"}
-  spec("650") {subs "abcdevxyz"}
-  spec("600") {subs "a"}
-  spec("651") {subs "aevxyz"}
-  spec("651") {subs "a"}
-  spec("653") {subs "a"}
-  spec("654") {subs "abevyz"}
-  spec("654") {subs "a"}
-  spec("655") {subs "abvxyz"}
-  spec("655") {subs "a"}
-  spec("656") {subs "akvxyz"}
-  spec("656") {subs "a"}
-  spec("657") {subs "avxyz"}
-  spec("657") {subs "a"}
-  spec("658") {subs "ab"}
-  spec("658") {subs "a"}
-  spec("662") {subs "abcdefgh"}
-  spec("662") {subs "a"}
+  spec("600abcdefghjklmnopqrstuvxyz")
+  spec("600a")
+  spec("610abcdefghklmnoprstuvxyz")
+  spec("610a")
+  spec("611acdefghjklnpqstuvxyz")
+  spec("611a")
+  spec("630adefghklmnoprstvxyz")
+  spec("630a")
+  spec("648avxyz")
+  spec("648a")
+  spec("650abcdevxyz")
+  spec("600a")
+  spec("651aevxyz")
+  spec("651a")
+  spec("653a")
+  spec("654abevyz")
+  spec("654a")
+  spec("655abvxyz")
+  spec("655a")
+  spec("656akvxyz")
+  spec("656a")
+  spec("657avxyz")
+  spec("657a")
+  spec("658ab")
+  spec("658a")
+  spec("662abcdefgh")
+  spec("662a")
 end
 
 
@@ -361,34 +359,34 @@ end
 
 
 field('genre') do
-  spec("655") {sub 'ab'}
+  spec("655ab")
 end
 
 field('geographic') do
   mapname 'area_map'
-  spec("043") {sub 'a'}
+  spec("043a")
 end
 
 field('era') do
-  spec("600") {sub "y"}
-  spec("610") {sub "y"}
-  spec("611") {sub "y"}
-  spec("630") {sub "y"}
-  spec("650") {sub "y"}
-  spec("651") {sub "y"}
-  spec("654") {sub "y"}
-  spec("655") {sub "y"}
-  spec("656") {sub "y"}
-  spec("657") {sub "y"}
-  spec("690") {sub "z"}
-  spec("691") {sub "y"}
-  spec("692") {sub "z"}
-  spec("694") {sub "z"}
-  spec("695") {sub "z"}
-  spec("696") {sub "z"}
-  spec("697") {sub "z"}
-  spec("698") {sub "z"}
-  spec("699") {sub "z"}
+  spec("600y")
+  spec("610y")
+  spec("611y")
+  spec("630y")
+  spec("650y")
+  spec("651y")
+  spec("654y")
+  spec("655y")
+  spec("656y")
+  spec("657y")
+  spec("690z")
+  spec("691y")
+  spec("692z")
+  spec("694z")
+  spec("695z")
+  spec("696z")
+  spec("697z")
+  spec("698z")
+  spec("699z")
 end
 
 field('country_of_pub') do
@@ -397,7 +395,7 @@ field('country_of_pub') do
     chars 15..17
     char  17
   }
-  spec("752") {subs 'ab'}
+  spec("752ab")
 end
 
 custom('publishDate') do
@@ -418,12 +416,12 @@ end
 ################################
 
 field('publisher') do
-  spec("260") {sub 'b'}
-  spec("533") {sub 'c'}
+  spec("260b")
+  spec("533c")
 end
 
 field('edition') do
-  spec("250") {sub 'a'}
+  spec("250a")
 end
 
 custom('language') do
@@ -437,12 +435,12 @@ end
 
 field('ht_availability') do
   mapname 'availability_map_ht'
-  spec("974") {sub 'r'}
+  spec("974r")
 end
 
 field('ht_availability_intl') do
   mapname 'availability_map_ht_intl'
-  spec("974") {sub 'r'}
+  spec("974r")
 end
 
 custom('htsource') do
