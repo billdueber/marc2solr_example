@@ -1,0 +1,4 @@
+machine "localhost"
+solrpath "/solr/biblio"
+port "8026"
+javabin true
