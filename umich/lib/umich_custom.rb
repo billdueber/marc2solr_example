@@ -144,6 +144,48 @@ module MARC2Solr
       end
       
       
+      
+      # Create a sortable string based on the digit strings present in an
+      # enumcron string
+
+      def self.enumcronSortString str
+        rv = '0'
+        str.scan(/\d+/).each do |nums|
+          rv += nums.size.to_s + nums
+        end
+        return rv
+      end
+
+
+      # We'll take an easy way out; add a :sortstring entry to each hash, and then 
+      # delete them later.
+      #
+      # @param [Array] info An array of hashes, each of which has an 'enumcron' entry
+      # @return [Arrray] the array sorted by our best guess of enumcron order
+
+      def self.sortHathiJSON arr
+        # Only one? Never mind
+        return arr if arr.size == 1
+        
+        # First, add the _sortstring entries
+        arr.each do |h|
+          if h.has_key? 'enumcron'
+            h[:sortstring] = enumcronSortString(h['enumcron'])
+          else
+            h[:sortstring] = '0'
+          end
+        end
+        
+
+        arr.sort! {|a,b| a[:sortstring] <=> b[:sortstring]}
+        arr.each do |h|
+          h.delete(:sortstring)
+          puts h['enumcron']
+        end
+        puts ""
+        return arr
+      end
+      
       # Get all the hathi stuff at once
       def self.getHathiStuff doc, r
         defaultDate = '00000000'
@@ -154,7 +196,7 @@ module MARC2Solr
         udates = []
         display = []
         jsonarr = []
-
+        gotEnumcron = false
         
         fields.each do |f|
           id = f['u']
@@ -169,14 +211,20 @@ module MARC2Solr
             'htid' => id,
             'ingest' => udate,
           }
-          info['enumcron'] = f['z'] if f['z']
+          if f['z']
+            info['enumcron'] = f['z'] 
+            gotEnumcron = true
+          end
           info['rights'] = f['r'] if f['r']
           jsonarr << info
         end
-
+        
+        # Sort the json in enumcron order if need be
+        jsonarr = sortHathiJSON(jsonarr) if gotEnumcron
+        
+        # Make sure we're all uniq
         ids.uniq!
         udates.uniq!
-
 
         return [display, udates, ids, jsonarr.to_json]
       end
