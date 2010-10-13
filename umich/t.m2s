@@ -1,0 +1,22 @@
+benchmark false
+dryrun true
+printdoc true
+debugfile 'out.tst'
+threads 1
+
+marctype "bestguess"
+
+# logfile "STDERR"
+logfile "DEFAULT"
+loglevel "INFO"
+logbatchsize 2000
+
+machine 'mojito.umdl.umich.edu'
+port "8024"
+solrpath 'solr/biblio'
+javabin true
+
+
+
+
+

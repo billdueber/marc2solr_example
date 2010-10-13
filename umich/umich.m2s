@@ -1,0 +1,4 @@
+umdir = "/Users/dueberb/devel/ruby/jruby/marc2solr_example/umich"
+indexfile "#{umdir}/index.dsl"
+tmapdir "#{umdir}/translation_maps"
+customdir "#{umdir}/lib"
