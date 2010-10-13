@@ -180,9 +180,7 @@ module MARC2Solr
         arr.sort! {|a,b| a[:sortstring] <=> b[:sortstring]}
         arr.each do |h|
           h.delete(:sortstring)
-          puts h['enumcron']
         end
-        puts ""
         return arr
       end
       

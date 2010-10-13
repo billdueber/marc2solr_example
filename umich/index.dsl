@@ -98,10 +98,10 @@ custom('sdrnum') do
   }
 end
 
-field('isbn') do
-  spec("020") {
-    sub 'a'
-    sub 'z'
+custom('isbn') do
+  function(:getISBNS) {
+    mod mc
+    args ['a', 'z']
   }
 end
 
