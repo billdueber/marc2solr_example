@@ -188,6 +188,7 @@ module MARC2Solr
       def self.getHathiStuff doc, r
         defaultDate = '00000000'
         fields = r.find_by_tag('974')
+        return nil unless fields;
         
         h = {}
         ids = []
@@ -219,7 +220,7 @@ module MARC2Solr
         
         # Sort the json in enumcron order if need be
         jsonarr = sortHathiJSON(jsonarr) if gotEnumcron
-        
+               
         # Make sure we're all uniq
         ids.uniq!
         udates.uniq!
