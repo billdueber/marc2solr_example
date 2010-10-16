@@ -2,11 +2,13 @@ $KCODE = 'utf8'
 require 'rubygems'
 require 'json'
 require 'marcspec'
-
+require 'jlogger'
 
 module MARC2Solr
   module Custom
     module UMich
+
+      include JLogger::Simple
       
       # Create a marc spec for SerialTitleRest
       
@@ -116,6 +118,9 @@ module MARC2Solr
           if ind2 > 0 and ind2 < val.length
             val = val[ind2..-1]
           end
+        else
+          log.error "No valid 245 title for record {}", r['001'].value
+	  return nil
         end
         return val.gsub(/[^\p{L}\p{N}]/, ' ').gsub(/\s+/, ' ').strip.downcase 
       end
@@ -128,12 +133,12 @@ module MARC2Solr
         case date.to_i
         when 1500..1800 then 
           century = date[0..1]
-          return century + '00' + century + '99'
+          return century + '00-' + century + '99'
         when 1801..2100 then
           decade = date[0..2]
           return decade + "0-" + decade + "9";
         else
-    #      puts "getDateRange: #{r['001'].value} invalid date #{date}"
+          log.debug "getDateRange: {} invalid date {}", r['001'].value, date
         end
       end
       
