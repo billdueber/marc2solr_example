@@ -20,7 +20,9 @@ end
 # want to generated the list of subfields algorithmically
 
 field('lccn') do
-  spec('010') {sub 'a'} # one line is fine if you like
+  spec('010') {
+    sub 'a' # can specify subfield codes with 'sub' or 'subs' in a block, too
+  }  
 end
 
 # For controlfieds, we support substrings, either by index (17) or
@@ -33,7 +35,7 @@ field('country_code') do
   spec('008') {chars 15..17}
   spec('008') {char 17}
   spec('752ab')
-  # spec(752) {sub ['a', 'b']} # could also use array
+  # spec(752) {sub ['a', 'b']} # using an array is fine
 end
 
 # You can always use a default value, which will be applied
@@ -86,7 +88,8 @@ end
 
 # As an extra bonus, if you specify :mapMissDefault => :passthrough,
 # the un-mappable value will just be passed through. If there is a mappable
-# value, then whatever is retuned from the map will go through 
+# value (e.g., there's a 'hit' when trying to map), then whatever is 
+# retuned from the map will go through 
 
 field('country_passthrough') do
   default '(Not specified)'
