@@ -1,0 +1,24 @@
+# DEBUG -- basic stuff for debugging
+
+# We're not going to send stuff to solr, but we need to 
+# define everything we need to define the solr target URL
+# regardless, to allow easier debugging on config options
+
+machine 'DoNotCare'
+port '0000'
+solrpath 'Not/using/this'
+
+
+# Crank up the logging to DEBUG
+loglevel "DEBUG"
+
+# Print out a text representation of created documents
+# to the given file
+
+printdoc true
+debugfile "debug.txt"
+
+
+# Don't actually send anything to Solr
+
+dryrun true
