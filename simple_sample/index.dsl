@@ -6,7 +6,7 @@
 # instead of just the first.
 
 field('id') do
-  spec(001)
+  spec('001')
   firstOnly
 end
 
