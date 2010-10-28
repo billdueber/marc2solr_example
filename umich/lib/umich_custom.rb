@@ -10,6 +10,8 @@ module MARC2Solr
 
       include JLogger::Simple
       
+
+      
       # Create a marc spec for SerialTitleRest
       
       SerialTitleRestFieldsSpec = MARCSpec::SolrFieldSpec.fromHash( 
@@ -38,6 +40,18 @@ module MARC2Solr
         ]
       })
       
+      
+      # Get the country map
+      COPMAP = MARCSpec::Map.fromFile(File.dirname(__FILE__) + '/../translation_maps/country_map.rb')
+      
+      def self.country_of_pub(doc, r)
+        data = []
+        [r['008'].value[15..17], r['008'].value[17..17]].each do |s|
+          data <<  COPMAP[s.gsub(/[^a-z]/, '')] if s
+        end
+        return data.compact
+      end
+          
       
       # Get the language(s)
       def self.getLanguage(doc, r)

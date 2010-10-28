@@ -389,12 +389,16 @@ field('era') do
   spec("699z")
 end
 
-field('country_of_pub') do
-  mapname 'country_map'
-  spec('008') {
-    chars 15..17
-    char  17
+# country from the 008; need processing until I fix the AlephSequential reader
+
+custom('country_of_pub') do
+  function(:country_of_pub) {
+    mod mcu
   }
+end
+
+# Also do the 752 for country of pub
+field('country_of_pub') do
   spec("752ab")
 end
 
