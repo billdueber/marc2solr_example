@@ -46,6 +46,7 @@ module MARC2Solr
       
       def self.country_of_pub(doc, r)
         data = []
+        return data unless r['008'];
         [r['008'].value[15..17], r['008'].value[17..17]].each do |s|
           data <<  COPMAP[s.gsub(/[^a-z]/, '')] if s
         end
