@@ -175,6 +175,16 @@ module MARC2Solr
         end
         return rv
       end
+      
+      def self.enumcronSort a,b
+        matcha = /(\d{4})/.match a['enumcron']
+        matchb = /(\d{4})/.match b['enumcron']
+        if (matcha and matchb)
+          puts "Sorting #{matcha[1]} vs #{matchb[1]}"
+          return matcha[1] <=> matchb[1] unless (matcha[1] == matchb[1])
+        end
+        return a[:sortstring] <=> b[:sortstring]
+      end        
 
 
       # We'll take an easy way out; add a :sortstring entry to each hash, and then 
@@ -197,7 +207,7 @@ module MARC2Solr
         end
         
 
-        arr.sort! {|a,b| a[:sortstring] <=> b[:sortstring]}
+        arr.sort! {|a,b| self.enumcronSort(a, b)}
         arr.each do |h|
           h.delete(:sortstring)
         end
