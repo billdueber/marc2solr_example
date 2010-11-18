@@ -435,7 +435,9 @@ custom('language') do
   }
 end
 
+#####################################
 ############ HATHITRUST STUFF #######
+#####################################
 
 field('ht_availability') do
   mapname 'availability_map_ht'
@@ -461,6 +463,20 @@ end
 custom(['ht_id_display', 'ht_id_update', 'ht_id', 'ht_json']) do
   function(:getHathiStuff) {
     mod mcu
+  }
+end
+
+custom('ht_searchonly') do
+  function(:isJustHathiSearchOnly) {
+    mod mcu
+    args 'ht_availability'
+  }
+end
+
+custom('ht_searchonly_intl') do
+  function(:isJustHathiSearchOnly) {
+    mod mcu
+    args 'ht_availability_intl'
   }
 end
 
