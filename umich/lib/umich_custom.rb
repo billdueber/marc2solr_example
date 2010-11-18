@@ -180,7 +180,6 @@ module MARC2Solr
         matcha = /(\d{4})/.match a['enumcron']
         matchb = /(\d{4})/.match b['enumcron']
         if (matcha and matchb)
-          puts "Sorting #{matcha[1]} vs #{matchb[1]}"
           return matcha[1] <=> matchb[1] unless (matcha[1] == matchb[1])
         end
         return a[:sortstring] <=> b[:sortstring]
@@ -258,6 +257,48 @@ module MARC2Solr
         return [display, udates, ids, jsonarr.to_json]
       end
       
+    
+      # Figure out if the only holdings on an item are HathiTrust
+      # searchonly.
+      
+      def self.isJustHathiSearchOnly doc, r, prevfield = 'ht_availability'
+
+        # First: are there even HT items?   
+        unless r.cachespot.has_key? 'hasHT'
+          if doc[prevfield] and doc[prevfield].size > 0
+            r.cachespot['hasHT'] = true
+          else 
+            r.cachespot['hasHT'] = false
+          end
+        end
+
+        return 'false' unless r.cachespot['hasHT']
+        
+        # Do we have umich holdings other than SDR?
+        
+        unless r.cachespot.has_key? 'hasUMICH'
+          r.cachespot['hasUMICH'] = false
+          r.find_by_tag('852').each do |f|
+            if f['b'] != 'SDR'
+              r.cachespot['hasUMICH'] = true
+              break
+            end
+          end
+        end
+        
+        return 'false' if r.cachespot['hasUMICH']
+        
+        # OK. We've got no UMICH holdings. We DO have HT holdings.
+        # Do we have fulltext? 
+        
+        if doc[prevfield].include? 'Full text'
+          return 'false'
+        else
+          return 'true'
+        end
+      end
+        
+        
     end
   end
 end
