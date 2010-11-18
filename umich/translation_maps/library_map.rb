@@ -24,6 +24,7 @@
  [/^SOC.*/, "Social Work"],
  [/^SCI.*/, "Shapiro Science"],
  [/^DHC.*/, "Donald Hall Collection"],
+ [/^DHCL.*/, "Donald Hall Collection"],
  [/^PUB.*/, "Public Health"],
  [/^UNION.*/, "Michigan Union"],
  [/^MUSM.*/, "Museums"],
