@@ -9,6 +9,6 @@
  "pd"=>"Full text",
  "pdus"=>"Search only",
  "und"=>"Search only",
- "opb"=>"Search only"}
+ "opb"=>"Full text"}
 
 }
