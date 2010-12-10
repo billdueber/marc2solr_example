@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+use strict;
+
+use Date::Manip;
+
+my $solrspecfile = $ARGV[0];
+my $startMD = $ARGV[1];
+my $endMD = $ARGV[2];
+
+my $year = UnixDate(ParseDate('today'), '%Y');
+
+
+unless (-r $solrspecfile and $startMD =~ /^\d{4}$/ and $endMD =~ /^\d{4}$/) {
+    print q{
+
+  catchup -- apply a batch of nightly updates (delete and insert) to a solr instance
+
+    catchup <machinespec.m2s> <start MMDD> <end MMDD>
+
+  Examples:
+  
+    catchup production.m2s 1211 1211 # apply one day to production
+    catchup dev.m2s 1215 1217 # apply three days to dev
+
+  Notes:
+
+    The year is assumed to be whatever the current year is.
+    Files are looked for both in ~/data and ~/data/processing/
+
+};
+
+    exit(1);
+}  
+
+foreach my $i ($startMD..$endMD) {
+    my $delfile =  "/l/solr-vufind/data/vufind_upd_$year" . $i . "_delete.log";
+    unless (-r $delfile) {
+      $delfile =  "/l/solr-vufind/data/processed/vufind_upd_$year" . $i . "_delete.log";
+      unless (-r $delfile) {
+	  die "Can't find delete file in ~/data or ~/data/processed: $delfile";
+      }
+    }
+  
+    my $marcfile =  "/l/solr-vufind/data/vufind_upd_$year" . $i . ".seq";
+    unless (-r $marcfile) {
+      $marcfile =  "/l/solr-vufind/data/processed/vufind_upd_$year" . $i . ".seq";
+      unless (-r $marcfile) {
+	  die "Can't find delete fmarc ~/data or ~/data/processed: $marcfile";
+      }
+    }
+    print "Deleting $i\n";
+    `marc2solr delete -c $solrspecfile --skipcommit $delfile`;
+    print "Indexing $i\n";
+    `marc2solr index -c $solrspecfile -c umich.m2s --skipcommit --threads 3 $marcfile`;
+}
+
+`marc2solr commit -c $solrspecfile`;
+
