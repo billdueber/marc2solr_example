@@ -18,4 +18,5 @@
    "njp"=>"Princeton University",
    "yale"=>"Yale University",
    "chi"=>"University of Chicago",
-   "coo"=>"Cornell University"}}
+   "coo"=>"Cornell University",
+   "ucm"=>"Universidad Complutense de Madrid"}}
