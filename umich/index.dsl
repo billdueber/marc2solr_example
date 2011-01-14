@@ -466,19 +466,6 @@ custom(['ht_id_display', 'ht_id_update', 'ht_id', 'ht_json']) do
   }
 end
 
-custom('ht_searchonly') do
-  function(:isJustHathiSearchOnly) {
-    mod mcu
-    args 'ht_availability'
-  }
-end
-
-custom('ht_searchonly_intl') do
-  function(:isJustHathiSearchOnly) {
-    mod mcu
-    args 'ht_availability_intl'
-  }
-end
 
 ########### HLB #############
 
@@ -488,13 +475,5 @@ custom(['hlb3', 'hlb3Delimited']) do
     mod MARC2Solr::Custom::HighLevelBrowse
   }
 end
-
-
-
-
-
-
-
-
 
 
