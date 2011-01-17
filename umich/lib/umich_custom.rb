@@ -265,44 +265,40 @@ module MARC2Solr
       # Figure out if the only holdings on an item are HathiTrust
       # searchonly.
       
-      def self.isJustHathiSearchOnly doc, r, prevfield = 'ht_availability'
+      def self.isJustHathiSearchOnly doc, r, prevfield
 
-        # First: are there even HT items?   
-        unless r.cachespot.has_key? 'hasHT'
-          if doc[prevfield] and doc[prevfield].size > 0
-            r.cachespot['hasHT'] = true
-          else 
-            r.cachespot['hasHT'] = false
-          end
+        # First: are there even HT items?
+        
+        unless doc['ht_id'] and doc['ht_id'].size > 0
+          # puts "#{r['001'].data} false via noHT"
+          return false;
         end
-
-        return 'false' unless r.cachespot['hasHT']
+                   
+        # Do we have fulltext HT holdings in the given field (ht_availability or ht_availability_intl)
+        if (doc[prevfield].include? 'Full text')
+          # puts "#{r['001'].data} false via fulltext"
+          return 'false'
+        end
         
         # Do we have umich holdings other than SDR?
         
-        unless r.cachespot.has_key? 'hasUMICH'
-          r.cachespot['hasUMICH'] = false
-          r.find_by_tag('852').each do |f|
-            if f['b'] != 'SDR'
-              r.cachespot['hasUMICH'] = true
-              break
-            end
+        r.cachespot['hasUMICH'] = false
+        r.find_by_tag('852').each do |f|
+          if f['b'] != 'SDR'
+            # puts "#{r['001'].data} false via non-HT holding"
+            r.cachespot['hasUMICH'] = true
           end
         end
         
         return 'false' if r.cachespot['hasUMICH']
         
-        # OK. We've got no UMICH holdings. We DO have HT holdings.
-        # Do we have fulltext? 
+        # Otherwise...
         
-        if doc[prevfield].include? 'Full text'
-          return 'false'
-        else
-          return 'true'
-        end
+        # puts  "#{r['001'].data} true"
+        return 'true'
       end
-        
-        
+      
+      
     end
   end
 end
