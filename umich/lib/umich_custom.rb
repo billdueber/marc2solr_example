@@ -270,11 +270,13 @@ module MARC2Solr
         # First: are there even HT items?
         
         unless doc['ht_id'] and doc['ht_id'].size > 0
+          # puts "#{r['001'].data} false via noHT"
           return false;
         end
                    
         # Do we have fulltext HT holdings in the given field (ht_availability or ht_availability_intl)
         if (doc[prevfield].include? 'Full text')
+          # puts "#{r['001'].data} false via fulltext"
           return 'false'
         end
         
@@ -283,6 +285,7 @@ module MARC2Solr
         r.cachespot['hasUMICH'] = false
         r.find_by_tag('852').each do |f|
           if f['b'] != 'SDR'
+            # puts "#{r['001'].data} false via non-HT holding"
             r.cachespot['hasUMICH'] = true
           end
         end
@@ -291,6 +294,7 @@ module MARC2Solr
         
         # Otherwise...
         
+        # puts  "#{r['001'].data} true"
         return 'true'
       end
       
