@@ -298,6 +298,10 @@ module MARC2Solr
         return 'true'
       end
       
+      # Get the most recent cat date from the 972c
+      def self.most_recent_cat_date doc, r
+         return r.find_by_tag('972').map{|sf| sf['c']}.max || nil
+      end
       
     end
   end

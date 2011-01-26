@@ -45,8 +45,10 @@ field("availability") do
   spec("973b")
 end
 
-field("cat_date") do
-  spec("972c")
+custom("cat_date") do
+  function(:most_recent_cat_date) {
+    mod mcu
+  }
 end
 
 #### INSTITUTION / LOCATION ####
