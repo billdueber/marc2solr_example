@@ -280,6 +280,13 @@ module MARC2Solr
           return 'false'
         end
         
+        # Is it listed as being "available online" (avail_online in a 973b)
+        
+        r.find_by_tag('973').each do |f|
+          return false if f['b'] == 'avail_online';
+        end
+        
+        
         # Do we have umich holdings other than SDR?
         
         r.cachespot['hasUMICH'] = false
@@ -291,6 +298,9 @@ module MARC2Solr
         end
         
         return 'false' if r.cachespot['hasUMICH']
+        
+        
+        
         
         # Otherwise...
         
