@@ -7,8 +7,13 @@ my $solrspecfile = $ARGV[0];
 my $startMD = $ARGV[1];
 my $endMD = $ARGV[2];
 
-my $year = UnixDate(ParseDate('today'), '%Y');
+my $year = $ARGV[3] ||  UnixDate(ParseDate('today'), '%Y');
 
+my $start = ParseDate($year . $startMD);
+my $end   = ParseDate($year . $endMD);
+
+
+print "Catching up from ", UnixDate($start, '%Y-%m-%d'), " to ", UnixDate($end, '%Y-%m-%d'), "\n";
 
 unless (-r $solrspecfile and $startMD =~ /^\d{4}$/ and $endMD =~ /^\d{4}$/) {
     print q{
@@ -32,25 +37,30 @@ unless (-r $solrspecfile and $startMD =~ /^\d{4}$/ and $endMD =~ /^\d{4}$/) {
     exit(1);
 }  
 
-foreach my $i ($startMD..$endMD) {
-    my $delfile =  "/l/solr-vufind/data/vufind_upd_$year" . $i . "_delete.log";
+
+my $d = $start;
+while ($d <= $end) {
+    my $ymd = UnixDate($d, '%Y%m%d');
+    $d = DateCalc($d, '+ 1 day');
+
+    my $delfile =  "/l/solr-vufind/data/vufind_upd_". $ymd . "_delete.log";
     unless (-r $delfile) {
-      $delfile =  "/l/solr-vufind/data/processed/vufind_upd_$year" . $i . "_delete.log";
+      $delfile =  "/l/solr-vufind/data/processed/vufind_upd_" . $ymd . "_delete.log";
       unless (-r $delfile) {
 	  die "Can't find delete file in ~/data or ~/data/processed: $delfile";
       }
     }
   
-    my $marcfile =  "/l/solr-vufind/data/vufind_upd_$year" . $i . ".seq";
+    my $marcfile =  "/l/solr-vufind/data/vufind_upd_" . $ymd . ".seq";
     unless (-r $marcfile) {
-      $marcfile =  "/l/solr-vufind/data/processed/vufind_upd_$year" . $i . ".seq";
+      $marcfile =  "/l/solr-vufind/data/processed/vufind_upd_" . $ymd . ".seq";
       unless (-r $marcfile) {
 	  die "Can't find delete fmarc ~/data or ~/data/processed: $marcfile";
       }
     }
-    print "Deleting $i\n";
+    print "Deleting $ymd\n";
     `marc2solr delete -c $solrspecfile --skipcommit $delfile`;
-    print "Indexing $i\n";
+    print "Indexing $ymd\n";
     `marc2solr index -c $solrspecfile -c umich.m2s --skipcommit --threads 3 $marcfile`;
 }
 
