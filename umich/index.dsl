@@ -334,7 +334,7 @@ field('topic') do
   spec("648avxyz")
   spec("648a")
   spec("650abcdevxyz")
-  spec("600a")
+  spec("650a")
   spec("651aevxyz")
   spec("651a")
   spec("653a")
@@ -350,6 +350,8 @@ field('topic') do
   spec("658a")
   spec("662abcdefgh")
   spec("662a")
+  spec("690abcdevxyz")
+  spec("690a")
 end
 
 
