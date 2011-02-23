@@ -1,6 +1,6 @@
 {
  :maptype=>:kv,
- :mapname=>"format_map_umich_new",
+ :mapname=>"format_map_umich",
  :map => {"XX"=>"Unknown",
  "RU"=>"Audio",
  "RS"=>"Audio (spoken word)",
