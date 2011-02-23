@@ -45,8 +45,10 @@ field("availability") do
   spec("973b")
 end
 
-field("cat_date") do
-  spec("972c")
+custom("cat_date") do
+  function(:most_recent_cat_date) {
+    mod mcu
+  }
 end
 
 #### INSTITUTION / LOCATION ####
@@ -332,7 +334,7 @@ field('topic') do
   spec("648avxyz")
   spec("648a")
   spec("650abcdevxyz")
-  spec("600a")
+  spec("650a")
   spec("651aevxyz")
   spec("651a")
   spec("653a")
@@ -348,6 +350,8 @@ field('topic') do
   spec("658a")
   spec("662abcdefgh")
   spec("662a")
+  spec("690abcdevxyz")
+  spec("690a")
 end
 
 

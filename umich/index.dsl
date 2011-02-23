@@ -36,7 +36,7 @@ end
 ######## Local Data ##########
 
 field("format") do
-  mapname 'format_map_umich'
+  mapname 'format_map_umich_new'
   spec("970a")
 end
 
