@@ -64,5 +64,6 @@ while ($d <= $end) {
     `marc2solr index -c $solrspecfile -c umich.m2s --skipcommit --threads 3 $marcfile`;
 }
 
+print "Committing...\n";
 `marc2solr commit -c $solrspecfile`;
-
+print "Committed. Finished.\n\n";
