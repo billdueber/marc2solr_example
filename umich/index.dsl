@@ -180,6 +180,20 @@ field('author2') do
   spec("711ab")
 end
 
+
+field('authorSort') do
+  firstOnly
+  spec("100abcd")
+  spec("110abcd")
+  spec("111abc")
+  spec("110ab")
+  spec("111ab")
+  spec("700abcd")
+  spec("710ab")
+  spec("711ab")
+end
+
+
 field("author_top") do
   spec("100abcdefgjklnpqtu0")
   spec("110abcdefgklnptu04")
