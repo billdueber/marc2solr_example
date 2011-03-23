@@ -125,7 +125,7 @@ module MARC2Solr
             
       def self.getTitleSortable doc, r, codes
         f = r['245'] # only the first one!
-        unless f
+        unless f and f.sub_values().join('') =~ /\S/
           log.error "No valid 245 title for record {}", r['001'].value
           return nil
         end
