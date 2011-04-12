@@ -1,4 +1,3 @@
-$KCODE = 'utf8'
 require 'rubygems'
 require 'json'
 require 'marcspec'
@@ -141,7 +140,7 @@ module MARC2Solr
           log.error "No valid 245 title for record {}", r['001'].value
 	  return nil
         end
-        return val.gsub(/[^\p{L}\p{N}]/, ' ').gsub(/\s+/, ' ').strip.downcase 
+        return val.gsub(/[^\p{L}\p{N}]/u, ' ').gsub(/\s+/, ' ').strip.downcase 
       end
 
       def self.getDateRange(date, r)
@@ -209,7 +208,6 @@ module MARC2Solr
           end
         end
         
-
         arr.sort! {|a,b| self.enumcronSort(a, b)}
         arr.each do |h|
           h.delete(:sortstring)
