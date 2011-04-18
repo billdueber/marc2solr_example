@@ -19,4 +19,6 @@
    "yale"=>"Yale University",
    "chi"=>"University of Chicago",
    "coo"=>"Cornell University",
-   "ucm"=>"Universidad Complutense de Madrid"}}
+   "ucm"=>"Universidad Complutense de Madrid",
+   "loc"=>"Library of Congress",
+   "ien"=>"Northwestern University"}}

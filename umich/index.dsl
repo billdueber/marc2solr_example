@@ -478,7 +478,7 @@ custom('htsource') do
   }
 end
 
-custom(['ht_id_display', 'ht_id_update', 'ht_id', 'ht_json']) do
+custom(['ht_id_display', 'ht_id_update', 'ht_id', 'ht_json', 'ht_count']) do
   function(:getHathiStuff) {
     mod mcu
   }
