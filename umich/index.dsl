@@ -89,7 +89,7 @@ end
 custom('oclc') do
   function(:valsByPattern) {
     mod mc
-    args '035', 'a', /(?:oclc|ocolc|ocm|ocn).*?(\d+)/i, 1
+    args '035', 'az', /(?:oclc|ocolc|ocm|ocn).*?(\d+)/i, 1
   }
 end
 
