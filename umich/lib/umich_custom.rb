@@ -219,8 +219,9 @@ module MARC2Solr
       def self.getHathiStuff doc, r
         defaultDate = '00000000'
         fields = r.find_by_tag('974')
-        return nil unless fields;
+        return [nil,nil,nil,nil] unless fields and (fields.size > 0)
         
+        ht_count = fields.size
         h = {}
         ids = []
         udates = []
@@ -256,7 +257,7 @@ module MARC2Solr
         ids.uniq!
         udates.uniq!
 
-        return [display, udates, ids, jsonarr.to_json]
+        return [display, udates, ids, jsonarr.to_json, ht_count]
       end
       
     

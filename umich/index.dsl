@@ -89,7 +89,7 @@ end
 custom('oclc') do
   function(:valsByPattern) {
     mod mc
-    args '035', 'a', /(?:oclc|ocolc|ocm|ocn).*?(\d+)/i, 1
+    args '035', 'az', /(?:oclc|ocolc|ocm|ocn).*?(\d+)/i, 1
   }
 end
 
@@ -478,7 +478,7 @@ custom('htsource') do
   }
 end
 
-custom(['ht_id_display', 'ht_id_update', 'ht_id', 'ht_json']) do
+custom(['ht_id_display', 'ht_id_update', 'ht_id', 'ht_json', 'ht_count']) do
   function(:getHathiStuff) {
     mod mcu
   }
