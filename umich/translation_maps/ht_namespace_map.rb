@@ -21,4 +21,6 @@
    "coo"=>"Cornell University",
    "ucm"=>"Universidad Complutense de Madrid",
    "loc"=>"Library of Congress",
-   "ien"=>"Northwestern University"}}
+   "ien"=>"Northwestern University",
+   "hvd"=>"Harvard University",
+   "uva"=>"University of Virginia"}}
