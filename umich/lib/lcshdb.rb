@@ -47,6 +47,7 @@ module LCSHDB
   
     def get label
       label.gsub! /\p{P}+$/u, ''
+      return nil unless label =~ /\S/
       StringBinding.stringToEntry(label, @key)
       status = @db.get(nil, @key, @data, nil)
       return nil if status == OperationStatus::NOTFOUND
