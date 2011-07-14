@@ -467,6 +467,10 @@ field('ht_availability_intl') do
   spec("974r")
 end
 
+field('ht_rightscode') do
+  spec("974r")
+end
+
 custom('htsource') do
   mapname 'ht_namespace_map'
   function(:valsByPattern) {
