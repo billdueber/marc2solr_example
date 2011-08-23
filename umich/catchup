@@ -50,6 +50,7 @@ while ($d <= $end) {
 	  die "Can't find delete file in ~/data or ~/data/processed: $delfile";
       }
     }
+    print "Found delete file: $delfile\n";
   
     my $marcfile =  "/l/solr-vufind/data/vufind_upd_" . $ymd . ".seq";
     unless (-r $marcfile) {
@@ -58,6 +59,9 @@ while ($d <= $end) {
 	  die "Can't find delete fmarc ~/data or ~/data/processed: $marcfile";
       }
     }
+
+    print "Found seq file: $marcfile\n";
+
     print "Deleting $ymd\n";
     `marc2solr delete -c $solrspecfile --skipcommit $delfile`;
     print "Indexing $ymd\n";
