@@ -475,12 +475,6 @@ field('ht_rightscode') do
   spec("974r")
 end
 
-custom('ht_heldby') do
-  function(:getPrintHoldings) {
-    mod mcu
-  }
-end
-
 custom('htsource') do
   mapname 'ht_namespace_map'
   function(:valsByPattern) {
@@ -511,6 +505,13 @@ custom('ht_searchonly_intl') do
    args 'ht_availability_intl'
  }
 end
+
+custom('ht_heldby') do
+  function(:getPrintHoldings) {
+    mod mcu
+  }
+end
+
 
 ########### HLB #############
 

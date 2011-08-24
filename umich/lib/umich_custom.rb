@@ -2,6 +2,9 @@ require 'rubygems'
 require 'json'
 require 'marcspec'
 require 'jlogger'
+require 'java'
+require 'jdbc-helper'
+require 'mysql-connector-java-5.1.17-bin.jar'
 
 module MARC2Solr
   module Custom
@@ -138,7 +141,7 @@ module MARC2Solr
           end
         else
           log.error "No valid 245 title for record {}", r['001'].value
-	  return nil
+          return nil
         end
         return val.gsub(/[^\p{L}\p{N}]/u, ' ').gsub(/\s+/, ' ').strip.downcase 
       end
@@ -312,6 +315,44 @@ module MARC2Solr
       # Get the most recent cat date from the 972c
       def self.most_recent_cat_date doc, r
          return r.find_by_tag('972').map{|sf| sf['c']}.max || nil
+      end
+      
+      
+      ########################################################
+      # PRINT HOLDINGS
+      ########################################################
+      # Get the print holdings from the phdb, based on 
+      # hathitrust IDs.
+      #
+      
+      # Log in
+      @dbh = JDBCHelper::Connection.new(
+        :driver=>'com.mysql.jdbc.Driver', 
+        :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/mdp_holdings',
+        :user => 'mdp',
+        :password => 'II4md-py'
+      )
+      
+      @htidsnippet = "
+        select member_id from htitem_htmember_jn
+        where volume_id "
+      
+      def self.fromHTID htids
+        q = @htidsnippet + "IN (#{commaify htids})"
+        return @dbh.query(q).map{|a| a[0]}.uniq
+      end
+
+      # Produce a comma-delimited list. We presume there aren't any double-quotes
+      # in the values
+      
+      def self.commaify a
+        return *a.map{|v| "\"#{v}\""}.join(', ')
+      end
+      
+      def self.getPrintHoldings doc, r
+        # We presume we've got the htids already
+        return [] unless doc['ht_id'] and doc['ht_id'].size > 0
+        return fromHTID(doc['ht_id']).uniq
       end
       
     end
