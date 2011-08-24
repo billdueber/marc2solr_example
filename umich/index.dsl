@@ -1,4 +1,4 @@
-###############################
+############################### 
 ######## HELPERS ##############
 ###############################
 
@@ -456,6 +456,10 @@ end
 #####################################
 ############ HATHITRUST STUFF #######
 #####################################
+#
+# The HT stuff has gotten ridiculously complex
+# Needs refactoring in a big way. How many times am I going to
+# find the 974s? 
 
 field('ht_availability') do
   mapname 'availability_map_ht'
@@ -469,6 +473,12 @@ end
 
 field('ht_rightscode') do
   spec("974r")
+end
+
+custom('ht_heldby') do
+  function(:getPrintHoldings) {
+    mod mcu
+  }
 end
 
 custom('htsource') do
