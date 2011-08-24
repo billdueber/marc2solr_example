@@ -280,9 +280,11 @@ module MARC2Solr
         end
         
         # Is it listed as being "available online" (avail_online in a 973b)
+        # or "avail_circ"
         
         r.find_by_tag('973').each do |f|
           return false if f['b'] == 'avail_online';
+          return false if f['b'] == 'avail_circ';
         end
         
         
