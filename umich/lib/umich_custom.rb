@@ -5,8 +5,7 @@ require 'jlogger'
 require 'java'
 require 'jdbc-helper'
 require 'mysql-connector-java-5.1.17-bin.jar'
-load './secure_data.rb'
-
+require 'secure_data.rb'
 module MARC2Solr
   module Custom
     module UMich
