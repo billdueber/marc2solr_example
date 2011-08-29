@@ -7,6 +7,7 @@
  [/^SPEC GOSL/, "SPEC CHIL"],
  [/^SPEC CHIL.*/, "SPEC CHIL"],
  [/^SPEC LA.*/, "SPEC LABD"],
+ [/^SPEC MYR.*/, "SPEC MYERS"],
  [/^SPEC FAUL.*/, "SPEC FAUL"],
  [/^HATCH SEM/, "HATCH NER"],
  [/^HATCH MSHLV/, "HATCH BKS"],
