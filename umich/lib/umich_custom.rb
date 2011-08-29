@@ -326,20 +326,21 @@ module MARC2Solr
       #
       
       # Log in
-      @dbh = JDBCHelper::Connection.new(
-        :driver=>'com.mysql.jdbc.Driver', 
-        :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/mdp_holdings',
-        :user => 'mdp',
-        :password => 'II4md-py'
-      )
       
       @htidsnippet = "
         select member_id from htitem_htmember_jn
         where volume_id "
       
       def self.fromHTID htids
+        Thread.current[:phdbdbh] ||= JDBCHelper::Connection.new(
+          :driver=>'com.mysql.jdbc.Driver', 
+          :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/mdp_holdings',
+          :user => 'mdp',
+          :password => 'II4md-py'
+        )
+        
         q = @htidsnippet + "IN (#{commaify htids})"
-        return @dbh.query(q).map{|a| a[0]}.uniq
+        return Thread.current[:phdbdbh.query(q).map{|a| a[0]}.uniq
       end
 
       # Produce a comma-delimited list. We presume there aren't any double-quotes
