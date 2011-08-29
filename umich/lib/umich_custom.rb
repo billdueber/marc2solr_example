@@ -340,7 +340,7 @@ module MARC2Solr
         )
         
         q = @htidsnippet + "IN (#{commaify htids})"
-        return Thread.current[:phdbdbh.query(q).map{|a| a[0]}.uniq
+        return Thread.current[:phdbdbh].query(q).map{|a| a[0]}.uniq
       end
 
       # Produce a comma-delimited list. We presume there aren't any double-quotes
