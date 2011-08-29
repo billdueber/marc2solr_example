@@ -5,6 +5,7 @@ require 'jlogger'
 require 'java'
 require 'jdbc-helper'
 require 'mysql-connector-java-5.1.17-bin.jar'
+load './secure_data.rb'
 
 module MARC2Solr
   module Custom
@@ -335,8 +336,8 @@ module MARC2Solr
         Thread.current[:phdbdbh] ||= JDBCHelper::Connection.new(
           :driver=>'com.mysql.jdbc.Driver', 
           :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/mdp_holdings',
-          :user => 'mdp',
-          :password => 'II4md-py'
+          :user => MDP_USER,
+          :password => MDP_PASSWORD
         )
         
         q = @htidsnippet + "IN (#{commaify htids})"
