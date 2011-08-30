@@ -1,3 +1,4 @@
+
 ############################### 
 ######## HELPERS ##############
 ###############################
@@ -8,6 +9,15 @@
 mc = MARC2Solr::Custom
 mcu = MARC2Solr::Custom::UMich
 
+
+####################################
+#### Translation Maps ##############
+####################################
+
+# Get a copy of the translation maps so
+# we can send it into custom functions
+
+TMAPS = self.tmaps
 
 ################################
 ###### CORE FIELDS #############
@@ -460,57 +470,70 @@ end
 # The HT stuff has gotten ridiculously complex
 # Needs refactoring in a big way. How many times am I going to
 # find the 974s? 
+#
+# Sadly, I can't do it *all* with side effects because the syntax demands that
+# something actually get set. So, we'll set ht_id, and do everything else by
+# directly manipulating the doc
 
-field('ht_availability') do
-  mapname 'availability_map_ht'
-  spec("974r")
-end
-
-field('ht_availability_intl') do
-  mapname 'availability_map_ht_intl'
-  spec("974r")
-end
-
-field('ht_rightscode') do
-  spec("974r")
-end
-
-custom('htsource') do
-  mapname 'ht_namespace_map'
-  function(:valsByPattern) {
-    mod mc
-    args '974',  # tag
-           'u',  # subfield
-          /^([a-z0-9]+)\./, # match this
-          1 # return this match variable (everything up to the first period)
-  }
-end
-
-custom(['ht_id_display', 'ht_id_update', 'ht_id', 'ht_json', 'ht_count']) do
-  function(:getHathiStuff) {
+custom('ht_id') do
+  function(:fillHathi) {
     mod mcu
+    args TMAPS
   }
 end
 
-custom('ht_searchonly') do
- function(:isJustHathiSearchOnly) {
-   mod mcu
-   args 'ht_availability'
- }
-end
 
-custom('ht_searchonly_intl') do
- function(:isJustHathiSearchOnly) {
-   mod mcu
-   args 'ht_availability_intl'
- }
-end
+# field('ht_availability') do
+#   mapname 'availability_map_ht'
+#   spec("974r")
+# end
+# 
+# field('ht_availability_intl') do
+#   mapname 'availability_map_ht_intl'
+#   spec("974r")
+# end
+# 
+# field('ht_rightscode') do
+#   spec("974r")
+# end
+# 
+# custom('htsource') do
+#   mapname 'ht_namespace_map'
+#   function(:valsByPattern) {
+#     mod mc
+#     args '974',  # tag
+#            'u',  # subfield
+#           /^([a-z0-9]+)\./, # match this
+#           1 # return this match variable (everything up to the first period)
+#   }
+# end
+# 
+# 
+# custom(['ht_id_display', 'ht_id_update', 'ht_id', 'ht_json', 'ht_count']) do
+#   function(:getHathiStuff) {
+#     mod mcu
+#   }
+# end
+# 
+# custom('ht_searchonly') do
+#  function(:isJustHathiSearchOnly) {
+#    mod mcu
+#    args 'ht_availability'
+#  }
+# end
 
-custom('ht_heldby') do
-  function(:getPrintHoldings) {
-    mod mcu
-  }
-end
+# custom('ht_searchonly_intl') do
+#  function(:isJustHathiSearchOnly) {
+#    mod mcu
+#    args 'ht_availability_intl'
+#  }
+# end
+# 
+# custom('ht_heldby') do
+#   function(:getPrintHoldings) {
+#     mod mcu
+#   }
+# end
 
 
 ########### HLB #############

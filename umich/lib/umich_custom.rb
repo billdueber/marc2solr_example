@@ -6,6 +6,8 @@ require 'java'
 require 'jdbc-helper'
 require 'mysql-connector-java-5.1.17-bin.jar'
 require 'secure_data.rb'
+require 'pp'
+
 module MARC2Solr
   module Custom
     module UMich
@@ -169,7 +171,14 @@ module MARC2Solr
         return self.getDateRange pubdate[0], r
       end
       
+      def self.most_recent_cat_date doc, r
+         return r.find_by_tag('972').map{|sf| sf['c']}.max || nil
+      end
       
+      
+      ##############################################
+      # Deal with enumchron for Hathi
+      ##############################################
       
       # Create a sortable string based on the digit strings present in an
       # enumcron string
@@ -218,104 +227,163 @@ module MARC2Solr
         return arr
       end
       
-      # Get all the hathi stuff at once
-      def self.getHathiStuff doc, r
+      
+      ###############################################
+      # The hathitrust stuff is a disaster. Just put
+      # it all in one big method and use side effects.
+      #################################################
+      
+      def self.fillHathi doc, r, tmaps
+        # Set some defaults
         defaultDate = '00000000'
-        fields = r.find_by_tag('974')
-        return [nil,nil,nil,nil] unless fields and (fields.size > 0)
         
+        # Get the 974s
+        fields = r.find_by_tag('974');
+        
+        # How many of them are there?        
         ht_count = fields.size
-        h = {}
-        ids = []
-        udates = []
-        display = []
-        jsonarr = []
-        gotEnumcron = false
         
+        # If none, bail. Nothing to do
+        return if ht_count == 0
+        
+        # ...otherwise, set it
+        doc['ht_count'] = ht_count
+        
+        # Start off by assuming that it's HTSO for both us and intl
+        htso      = true
+        htso_intl = true
+        
+        # Presume no enumchron
+        gotEnumchron = false
+        
+        
+        # Places to stash things
+        htids = []
+        json = []
+        jsonindex = {} 
+        avail = {:us => [], :intl => []}
+        rights = []
+        sources = []
+         
+        # Loop through the fields to get what we need
         fields.each do |f|
-          id = f['u']
-          udate = f['d'] || defaultDate
           
-          ids << id
-          udates << udate
-          display << [id, udate, f['z']].join("|")
+          # Get the rights code
+          rc = f['r']
+          rights << rc
+          
+          # Set availability based on the rights code
+          us_avail = tmaps['availability_map_ht'][rc]
+          intl_avail =  tmaps['availability_map_ht_intl'][rc]
+          avail[:us] << us_avail
+          avail[:intl] << intl_avail
 
-          # Build up the json
-          info = {
+          # Get the ID. Put it in a local array (htids) because we have to return it
+          id = f['u']
+          htids << id
+          
+          # Extract the source
+          m = /^([a-z0-9]+)\./.match id
+          sources << m[1]
+        
+          # Update date
+          udate = f['d'] || defaultDate
+          doc.add 'ht_id_update', udate
+        
+          # Start the json rec.
+          jsonrec = {
             'htid' => id,
             'ingest' => udate,
+            'rights'  => rc,
+            'heldby'   => [] # fill in later
           }
-          if f['z']
-            info['enumcron'] = f['z'] 
-            gotEnumcron = true
+        
+          # enumchron
+          echron = f['z']
+          if echron
+            jsonrec['enumcron'] = echron 
+            gotEnumchron = true
           end
-          info['rights'] = f['r'] if f['r']
-          jsonarr << info
+   
+
+          # Display
+          doc.add 'ht_id_display', [id, udate, echron].join("|")
+          
+          # Add the current item's information to the json array,
+          # and keep a pointer to it in jsonindex so we can easily
+          # update the holdings later.
+   
+          json << jsonrec
+          jsonindex[id] = jsonrec
+          
+          # Does this item already negate HTSO?
+          htso = false if us_avail == 'Full Text'
+          htso_intl = false if intl_avail == 'Full Text'
         end
         
-        # Sort the json in enumcron order if need be
-        jsonarr = sortHathiJSON(jsonarr) if gotEnumcron
-               
-        # Make sure we're all uniq
-        ids.uniq!
-        udates.uniq!
-
-        return [display, udates, ids, jsonarr.to_json, ht_count]
+        # Done processing the items. Add aggreage info
+        doc.add 'ht_availability',  avail[:us].uniq
+        doc.add 'ht_availability_intl', avail[:intl].uniq
+        doc.add 'ht_rightscode', rights.uniq
+        doc.add 'htsource', sources.uniq
+        
+        
+        
+        
+        
+        # Now we need to do record-level
+        # stuff.
+        
+        # Figure out for real the HTSO status. It's only HTSO
+        # if the item-level stuff is htso (as represented by htso
+        # and htso_intl) AND the record_level stuff is also HTSO.
+        
+        record_htso = self.record_level_htso(r)  
+        doc['ht_searchonly'] = htso && record_htso
+        doc['ht_searchonly_intl'] = htso_intl && record_htso
+          
+        # Add in the print database holdings
+        heldby = []
+        holdings = self.fromHTID(htids)
+        holdings.each do |a|
+          htid, inst = *a
+          heldby << inst
+          jsonindex[htid]['heldby'] << inst
+        end
+        
+        doc['ht_heldby'] = heldby.uniq
+        
+        # Sort and JSONify the json structure 
+        json = sortHathiJSON json if gotEnumchron
+        doc['ht_json'] = json.to_json
+        
+        # Finally, return the ids
+        return htids
+        
       end
       
-    
-      # Figure out if the only holdings on an item are HathiTrust
-      # searchonly.
       
-      def self.isJustHathiSearchOnly doc, r, prevfield
-
-        # First: are there even HT items?
-        
-        unless doc['ht_id'] and doc['ht_id'].size > 0
-          # puts "#{r['001'].data} false via noHT"
-          return false;
-        end
-                   
-        # Do we have fulltext HT holdings in the given field (ht_availability or ht_availability_intl)
-        if (doc[prevfield] and doc[prevfield].include? 'Full text')
-          # puts "#{r['001'].data} false via fulltext"
-          return 'false'
-        end
-        
-        # Is it listed as being "available online" (avail_online in a 973b)
-        # or "avail_circ"
-        
+      ############################################################
+      # Get record-level boolean for whether or not this is HTSO
+      ###########################################################
+      def self.record_level_htso r
+        # Check to see if we have an online or circ holding
         r.find_by_tag('973').each do |f|
           return false if f['b'] == 'avail_online';
           return false if f['b'] == 'avail_circ';
         end
         
-        
-        # Do we have umich holdings other than SDR?
-        
-        r.cachespot['hasUMICH'] = false
+        # Check to see if we have a local holding that's not SDR
         r.find_by_tag('852').each do |f|
-          if f['b'] and f['b'] != 'SDR'
-            # puts "#{r['001'].data} false via non-HT holding"
-            r.cachespot['hasUMICH'] = true
-          end
+          return false if f['b'] and f['b'] != 'SDR'
         end
         
-        return 'false' if r.cachespot['hasUMICH']
-        
-        
-        
-        
-        # Otherwise...
-        
-        # puts  "#{r['001'].data} true"
-        return 'true'
+        # otherwise
+        return true
       end
+        
       
-      # Get the most recent cat date from the 972c
-      def self.most_recent_cat_date doc, r
-         return r.find_by_tag('972').map{|sf| sf['c']}.max || nil
-      end
+        
       
       
       ########################################################
@@ -328,7 +396,7 @@ module MARC2Solr
       # Log in
       
       @htidsnippet = "
-        select member_id from htitem_htmember_jn
+        select volume_id, member_id from htitem_htmember_jn
         where volume_id "
       
       def self.fromHTID htids
@@ -340,7 +408,7 @@ module MARC2Solr
         )
         
         q = @htidsnippet + "IN (#{commaify htids})"
-        return Thread.current[:phdbdbh].query(q).map{|a| a[0]}.uniq
+        return Thread.current[:phdbdbh].query(q)
       end
 
       # Produce a comma-delimited list. We presume there aren't any double-quotes
@@ -350,11 +418,6 @@ module MARC2Solr
         return *a.map{|v| "\"#{v}\""}.join(', ')
       end
       
-      def self.getPrintHoldings doc, r
-        # We presume we've got the htids already
-        return [] unless doc['ht_id'] and doc['ht_id'].size > 0
-        return fromHTID(doc['ht_id']).uniq
-      end
       
     end
   end
