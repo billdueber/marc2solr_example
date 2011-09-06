@@ -256,6 +256,13 @@ custom('title_a') do
   }
 end
 
+custom('vtitle') do
+  function(:getTitle) {
+    mod mcu
+    args ['abdefghknp'.split(//), false, 2] # don't strip, use the second title only
+  }
+end
+
 # titleSort is the same as title_ab, but with the transform in 
 # getTitleSortable applied
 
