@@ -91,18 +91,25 @@ module MARC2Solr
       # Could get more efficiency by passing data from title fields to each other down
       # the line (maybe shave 2-3% off total processing time)
       
-      def self.getTitle(doc, r, codes)
+      def self.getTitle(doc, r, codes, strip = true, index=nil)
         data = []
         fields = r.find_by_tag('245')
+        # Do we want a particular one?
+        if (index) 
+          fields = [fields[index - 1]].compact
+          return [] if fields.size == 0
+        end
         fields.each do |f|
           subvals = f.sub_values(codes)
           subvals.compact!
           if subvals.size > 0
             val = subvals.join(' ')
             data << val
-            ind2 = f.indicator2.to_i
-            if ind2 > 0 and ind2 < val.length
-              data << val[ind2..-1]
+            if strip
+              ind2 = f.indicator2.to_i
+              if ind2 > 0 and ind2 < val.length
+                data << val[ind2..-1]
+              end
             end
           end
         end
