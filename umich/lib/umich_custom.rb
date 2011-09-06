@@ -92,15 +92,11 @@ module MARC2Solr
       # the line (maybe shave 2-3% off total processing time)
       
       def self.getTitle(doc, r, codes, strip=true, index=nil)
-        log.info "getTitle with #{codes}, #{strip.inspect}, #{index}"
         data = []
         fields = r.find_by_tag('245')
         # Do we want a particular one?
         if (index) 
-          log.info "Index in getTitle is #{index}"
-          log.info "Field size is #{fields.size}"
           fields = [fields[index - 1]].compact
-          log.info "Compacted fields is #{fields.inspect}; size is #{fields.size}"
           return [] if fields.size == 0
         end
         fields.each do |f|
