@@ -290,7 +290,12 @@ module MARC2Solr
           htids << id
           
           # Extract the source
-          m = /^([a-z0-9]+)\./.match id
+          m = /^(.*?+)\./.match id
+          unless m and m[1]
+            log.error "Bad htid '#{id}' in record #{ r['001'].value}"
+            next
+          end
+          
           sources << m[1]
         
           # Update date
