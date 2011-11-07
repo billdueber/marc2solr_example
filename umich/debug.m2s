@@ -2,6 +2,6 @@ dryrun true
 
 benchmark false
 printdoc true
-debugfile "debug_info.txt"
+debugfile "dryrun_info.txt"
 loglevel "DEBUG"
 threads 1
