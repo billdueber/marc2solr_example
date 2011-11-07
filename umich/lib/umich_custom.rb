@@ -45,8 +45,11 @@ module MARC2Solr
       })
       
       
-      # Get the country map
+      # Get the country map and the HT Source map
       COPMAP = MARCSpec::Map.fromFile(File.dirname(__FILE__) + '/../translation_maps/country_map.rb')
+      
+      HTSOURCEMAP = MARCSpec::Map.fromFile(File.dirname(__FILE__) + '/../translation_maps/ht_namespace_map.rb')
+      
       
       def self.country_of_pub(doc, r)
         data = []
@@ -300,7 +303,7 @@ module MARC2Solr
             next
           end
           
-          sources << m[1]
+          sources << HTSOURCEMAP[m[1]]
         
           # Update date
           udate = f['d'] || defaultDate
