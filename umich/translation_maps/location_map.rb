@@ -9,6 +9,8 @@
  [/^SPEC LA.*/, "SPEC LABD"],
  [/^SPEC MYR.*/, "SPEC MYERS"],
  [/^SPEC FAUL.*/, "SPEC FAUL"],
+ [/^SPEC SCI$/, "SPEC RARE"],
+ [/^SPEC$/, "SPEC RARE"],
  [/^HATCH SEM/, "HATCH NER"],
  [/^HATCH MSHLV/, "HATCH BKS"],
  [/^HATCH MREF/, "HATCH BKS"],
