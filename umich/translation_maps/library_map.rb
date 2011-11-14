@@ -6,6 +6,7 @@
  [/^HATCH AOVR/, "Hatcher Graduate Asia Library"],
  [/^HATCH AOFF/, "Hatcher Graduate Asia Library"],
  [/^HATCH AMIC/, "Hatcher Graduate Asia Library"],
+ [/^HATCH CL.*/, "Hatcher Graduate Clark Library"],
  [/^HATCH.*/, "Hatcher Graduate"],
  [/^UMTRI.*/, "Transportation Research Institute Library (UMTRI)"],
  [/^UGL.*/, "Shapiro Undergraduate"],
