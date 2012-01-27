@@ -4,8 +4,8 @@
    :map => [
       [/^ic$/, "Search only"],
       [/^umall$/, "Full text"],
-      [/^orph$/, "Search only"],
-      [/^world$/, "Full text"],
+      [/^orph$/, "Search only"]
+      [/world$/, "Full text"],       # matches world, ic-world, und-world,
       [/^nobody$/, "Search only"],
       [/^und$/, "Search only"],
       [/^opb$/, "Full text"],

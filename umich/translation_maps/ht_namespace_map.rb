@@ -23,4 +23,12 @@
    "loc"=>"Library of Congress",
    "ien"=>"Northwestern University",
    "hvd"=>"Harvard University",
-   "uva"=>"University of Virginia"}}
+   "uva"=>"University of Virginia",
+   "dul1"=>"Duke University",
+   "ncs1"=>"North Carolina State University",
+   "nc01"=>"University of North Carolina",
+   "pur1"=>"Purdue University",
+   "pur2"=>"Purdue University",
+   "mdl"=>"Minnesota Digital Library",
+   "usu"=>"Utah State University Press",
+   "gri"=>"Getty Research Institute"}}

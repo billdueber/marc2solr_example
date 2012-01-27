@@ -4,7 +4,7 @@
 
 {
  :maptype=>:multi,
- :mapname=>"strip"
+ :mapname=>"strip",
  :map => [
    [/^\s*(.+?)[.,<>;:_\/&^!~`[:space:]]*$/, Proc.new {|m| m[1]}],
  ]
