@@ -165,6 +165,13 @@ field('callnumber') do
   spec("852hij")
 end
 
+field('callnoletters') do
+  firstOnly
+  spec('050ab')
+  spec('090ab')
+  spec('852hij')
+end
+
 field('sudoc') do
   spec("086") {
     sub 'a'
