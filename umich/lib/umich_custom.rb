@@ -13,12 +13,12 @@ module MARC2Solr
     module UMich
 
       include JLogger::Simple
-      
 
-      
+
+
       # Create a marc spec for SerialTitleRest
-      
-      SerialTitleRestFieldsSpec = MARCSpec::SolrFieldSpec.fromHash( 
+
+      SerialTitleRestFieldsSpec = MARCSpec::SolrFieldSpec.fromHash(
         {
         :solrField => 'serialTitleRest_internal',
         :specs => [
@@ -40,17 +40,17 @@ module MARC2Solr
           ["780", "st"],
           ["785", "st"],
           ["786", "st"],
-          ["787", "st"]          
+          ["787", "st"]
         ]
       })
-      
-      
+
+
       # Get the country map and the HT Source map
       COPMAP = MARCSpec::Map.fromFile(File.dirname(__FILE__) + '/../translation_maps/country_map.rb')
-      
+
       HTSOURCEMAP = MARCSpec::Map.fromFile(File.dirname(__FILE__) + '/../translation_maps/ht_namespace_map.rb')
-      
-      
+
+
       def self.country_of_pub(doc, r)
         data = []
         return data unless r['008'];
@@ -59,8 +59,8 @@ module MARC2Solr
         end
         return data.compact
       end
-          
-      
+
+
       # Get the language(s)
       def self.getLanguage(doc, r)
         rawdata  = []
@@ -85,20 +85,20 @@ module MARC2Solr
         end
         return rawdata
       end
-      
-      
+
+
       # For each title (245), extract the given codes, and then
       # return both that whole string and the the string with the
       # number of charactes indicated by ind2 (the "non-filing chars) removed.
       #
       # Could get more efficiency by passing data from title fields to each other down
       # the line (maybe shave 2-3% off total processing time)
-      
+
       def self.getTitle(doc, r, codes, strip=true, index=nil)
         data = []
         fields = r.find_by_tag('245')
         # Do we want a particular one?
-        if (index) 
+        if (index)
           fields = [fields[index - 1]].compact
           return [] if fields.size == 0
         end
@@ -118,7 +118,7 @@ module MARC2Solr
         end
         return data
       end
-      
+
       def self.getSerialTitle doc, r, codes
         if doc['format'] and doc['format'].include? 'Serial'
           return self.getTitle(doc, r, codes)
@@ -126,8 +126,8 @@ module MARC2Solr
           return []
         end
       end
-      
-      
+
+
       def self.getSerialTitleRest doc, r
         if doc['format'] and doc['format'].include? 'Serial'
           return SerialTitleRestFieldsSpec.marc_values(r)
@@ -135,8 +135,8 @@ module MARC2Solr
           return []
         end
       end
-      
-            
+
+
       def self.getTitleSortable doc, r, codes
         f = r['245'] # only the first one!
         unless f and f.sub_values().join('') =~ /\S/
@@ -155,7 +155,7 @@ module MARC2Solr
           log.error "No valid 245 title for record {}", r['001'].value
           return nil
         end
-        return val.gsub(/[^\p{L}\p{N}]/u, ' ').gsub(/\s+/, ' ').strip.downcase 
+        return val.gsub(/[^\p{L}\p{N}]/u, ' ').gsub(/\s+/, ' ').strip.downcase
       end
 
       def self.getDateRange(date, r)
@@ -164,7 +164,7 @@ module MARC2Solr
         end
 
         case date.to_i
-        when 1500..1800 then 
+        when 1500..1800 then
           century = date[0..1]
           return century + '00-' + century + '99'
         when 1801..2100 then
@@ -174,22 +174,22 @@ module MARC2Solr
           log.debug "getDateRange: {} invalid date {}", r['001'].value, date
         end
       end
-      
+
       def self.publishDateRange(doc,r)
         pubdate = doc['publishDate']
         return [] unless pubdate and pubdate.size > 0
         return self.getDateRange pubdate[0], r
       end
-      
+
       def self.most_recent_cat_date doc, r
          return r.find_by_tag('972').map{|sf| sf['c']}.max || nil
       end
-      
-      
+
+
       ##############################################
       # Deal with enumchron for Hathi
       ##############################################
-      
+
       # Create a sortable string based on the digit strings present in an
       # enumcron string
 
@@ -200,7 +200,7 @@ module MARC2Solr
         end
         return rv
       end
-      
+
       def self.enumcronSort a,b
         matcha = /(\d{4})/.match a['enumcron']
         matchb = /(\d{4})/.match b['enumcron']
@@ -208,10 +208,10 @@ module MARC2Solr
           return matcha[1] <=> matchb[1] unless (matcha[1] == matchb[1])
         end
         return a[:sortstring] <=> b[:sortstring]
-      end        
+      end
 
 
-      # We'll take an easy way out; add a :sortstring entry to each hash, and then 
+      # We'll take an easy way out; add a :sortstring entry to each hash, and then
       # delete them later.
       #
       # @param [Array] info An array of hashes, each of which has an 'enumcron' entry
@@ -220,7 +220,7 @@ module MARC2Solr
       def self.sortHathiJSON arr
         # Only one? Never mind
         return arr if arr.size == 1
-        
+
         # First, add the _sortstring entries
         arr.each do |h|
           if h.has_key? 'enumcron'
@@ -229,63 +229,63 @@ module MARC2Solr
             h[:sortstring] = '0'
           end
         end
-        
+
         arr.sort! {|a,b| self.enumcronSort(a, b)}
         arr.each do |h|
           h.delete(:sortstring)
         end
         return arr
       end
-      
-      
+
+
       ###############################################
       # The hathitrust stuff is a disaster. Just put
       # it all in one big method and use side effects.
       #################################################
-      
+
       def self.fillHathi doc, r, tmaps
         # Set some defaults
         defaultDate = '00000000'
-        
+
         # Get the 974s
         fields = r.find_by_tag('974');
-        
-        # How many of them are there?        
+
+        # How many of them are there?
         ht_count = fields.size
-        
+
         # If zero, just set HTSO to false and bail. Nothing to do
         if ht_count == 0
           doc['ht_searchonly'] = false
           doc['ht_searchonly_intl'] = false
           return nil
         end
-        
+
         # ...otherwise, set it
         doc['ht_count'] = ht_count
-        
+
         # Start off by assuming that it's HTSO for both us and intl
         htso      = true
         htso_intl = true
-        
+
         # Presume no enumchron
         gotEnumchron = false
-        
-        
+
+
         # Places to stash things
         htids = []
         json = []
-        jsonindex = {} 
+        jsonindex = {}
         avail = {:us => [], :intl => []}
         rights = []
         sources = []
-         
+
         # Loop through the fields to get what we need
         fields.each do |f|
-          
+
           # Get the rights code
           rc = f['r']
           rights << rc
-          
+
           # Set availability based on the rights code
           us_avail = tmaps['availability_map_ht'][rc]
           intl_avail =  tmaps['availability_map_ht_intl'][rc]
@@ -295,20 +295,20 @@ module MARC2Solr
           # Get the ID. Put it in a local array (htids) because we have to return it
           id = f['u']
           htids << id
-          
+
           # Extract the source
           m = /^(.*?+)\./.match id
           unless m and m[1]
             log.error "Bad htid '#{id}' in record #{ r['001'].value}"
             next
           end
-          
+
           sources << HTSOURCEMAP[m[1]]
-        
+
           # Update date
           udate = f['d'] || defaultDate
           doc.add 'ht_id_update', udate
-        
+
           # Start the json rec.
           jsonrec = {
             'htid' => id,
@@ -316,51 +316,51 @@ module MARC2Solr
             'rights'  => rc,
             'heldby'   => [] # fill in later
           }
-        
+
           # enumchron
           echron = f['z']
           if echron
-            jsonrec['enumcron'] = echron 
+            jsonrec['enumcron'] = echron
             gotEnumchron = true
           end
-   
+
 
           # Display
           doc.add 'ht_id_display', [id, udate, echron].join("|")
-          
+
           # Add the current item's information to the json array,
           # and keep a pointer to it in jsonindex so we can easily
           # update the holdings later.
-   
+
           json << jsonrec
           jsonindex[id] = jsonrec
-          
+
           # Does this item already negate HTSO?
           htso = false if us_avail == 'Full Text'
           htso_intl = false if intl_avail == 'Full Text'
         end
-        
+
         # Done processing the items. Add aggreage info
         doc.add 'ht_availability',  avail[:us].uniq
         doc.add 'ht_availability_intl', avail[:intl].uniq
         doc.add 'ht_rightscode', rights.uniq
         doc.add 'htsource', sources.uniq
-        
-        
-        
-        
-        
+
+
+
+
+
         # Now we need to do record-level
         # stuff.
-        
+
         # Figure out for real the HTSO status. It's only HTSO
         # if the item-level stuff is htso (as represented by htso
         # and htso_intl) AND the record_level stuff is also HTSO.
-        
-        record_htso = self.record_level_htso(r)  
+
+        record_htso = self.record_level_htso(r)
         doc['ht_searchonly'] = htso && record_htso
         doc['ht_searchonly_intl'] = htso_intl && record_htso
-          
+
         # Add in the print database holdings
         heldby = []
         holdings = self.fromHTID(htids)
@@ -369,19 +369,19 @@ module MARC2Solr
           heldby << inst
           jsonindex[htid]['heldby'] << inst
         end
-        
+
         doc['ht_heldby'] = heldby.uniq
-        
-        # Sort and JSONify the json structure 
+
+        # Sort and JSONify the json structure
         json = sortHathiJSON json if gotEnumchron
         doc['ht_json'] = json.to_json
-        
+
         # Finally, return the ids
         return htids
-        
+
       end
-      
-      
+
+
       ############################################################
       # Get record-level boolean for whether or not this is HTSO
       ###########################################################
@@ -391,53 +391,53 @@ module MARC2Solr
           return false if f['b'] == 'avail_online';
           return false if f['b'] == 'avail_circ';
         end
-        
+
         # Check to see if we have a local holding that's not SDR
         r.find_by_tag('852').each do |f|
           return false if f['b'] and f['b'] != 'SDR'
         end
-        
+
         # otherwise
         return true
       end
-        
-      
-        
-      
-      
+
+
+
+
+
       ########################################################
       # PRINT HOLDINGS
       ########################################################
-      # Get the print holdings from the phdb, based on 
+      # Get the print holdings from the phdb, based on
       # hathitrust IDs.
       #
-      
+
       # Log in
-      
+
       @htidsnippet = "
         select volume_id, member_id from htitem_htmember_jn
         where volume_id "
-      
+
       def self.fromHTID htids
         Thread.current[:phdbdbh] ||= JDBCHelper::Connection.new(
-          :driver=>'com.mysql.jdbc.Driver', 
+          :driver=>'com.mysql.jdbc.Driver',
           :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/mdp_holdings',
           :user => MDP_USER,
           :password => MDP_PASSWORD
         )
-        
+
         q = @htidsnippet + "IN (#{commaify htids})"
         return Thread.current[:phdbdbh].query(q)
       end
 
       # Produce a comma-delimited list. We presume there aren't any double-quotes
       # in the values
-      
+
       def self.commaify a
         return *a.map{|v| "\"#{v}\""}.join(', ')
       end
-      
-      
+
+
     end
   end
 end

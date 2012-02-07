@@ -485,6 +485,10 @@ custom('language') do
   }
 end
 
+field('language008') do
+  spec('008') {chars 35..37}
+end
+
 #####################################
 ############ HATHITRUST STUFF #######
 #####################################
