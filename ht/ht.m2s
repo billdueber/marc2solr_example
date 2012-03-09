@@ -1,0 +1,5 @@
+#umdir = "/l/solr-vufind/apps/marc2solr_example/ht"
+umdir = "/Users/dueberb/devel/ruby/jruby/marc2solr_example/ht"
+indexfile "#{umdir}/index.dsl"
+tmapdir "#{umdir}/translation_maps"
+customdir "#{umdir}/lib"
