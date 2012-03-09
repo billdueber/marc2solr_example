@@ -3,17 +3,16 @@ require 'json'
 require 'marcspec'
 require 'jlogger'
 require 'java'
-require 'jdbc-helper'
-require 'mysql-connector-java-5.1.17-bin.jar'
-require 'secure_data.rb'
 require 'pp'
+# require 'jdbc-helper'
+# require 'mysql-connector-java-5.1.17-bin.jar'
+# require 'secure_data.rb'
 
 module MARC2Solr
   module Custom
     module UMich
 
       include JLogger::Simple
-
 
 
       # Create a marc spec for SerialTitleRest
@@ -362,17 +361,19 @@ module MARC2Solr
         doc['ht_searchonly_intl'] = htso_intl && record_htso
 
         # Add in the print database holdings
-        heldby = []
-        holdings = self.fromHTID(htids)
-        holdings.each do |a|
-          htid, inst = *a
-          heldby << inst
-          jsonindex[htid]['heldby'] << inst
-        end
 
-        doc['ht_heldby'] = heldby.uniq
+        # heldby = []
+        # holdings = self.fromHTID(htids)
+        # holdings.each do |a|
+        #   htid, inst = *a
+        #   heldby << inst
+        #   jsonindex[htid]['heldby'] << inst
+        # end
+        # 
+        # doc['ht_heldby'] = heldby.uniq
 
         # Sort and JSONify the json structure
+
         json = sortHathiJSON json if gotEnumchron
         doc['ht_json'] = json.to_json
 
