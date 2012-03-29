@@ -1,5 +1,5 @@
-machine "localhost"
-solrpath "/solr/biblio"
-port "8024"
+machine "solr-sdr-dev"
+solrpath "catalog"
+port "9033"
 javabin true
 

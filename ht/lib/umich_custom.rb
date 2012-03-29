@@ -251,7 +251,7 @@ module MARC2Solr
 
         # How many of them are there?
         ht_count = fields.size
-
+        
         # If zero, just set HTSO to false and bail. Nothing to do
         if ht_count == 0
           doc['ht_searchonly'] = false
