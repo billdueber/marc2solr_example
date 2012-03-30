@@ -45,6 +45,12 @@ end
 
 ######## Local Data ##########
 
+field("format") do
+  mapname 'format_map_umich'
+  spec("970a")
+end
+
+
 custom("cat_date") do
   function(:most_recent_cat_date) {
     mod mcu

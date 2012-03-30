@@ -4,9 +4,9 @@ require 'marcspec'
 require 'jlogger'
 require 'java'
 require 'pp'
-# require 'jdbc-helper'
-# require 'mysql-connector-java-5.1.17-bin.jar'
-# require 'secure_data.rb'
+require 'jdbc-helper'
+#require 'mysql-connector-java-5.1.17-bin.jar'
+#require 'secure_data.rb'
 
 module MARC2Solr
   module Custom
@@ -252,10 +252,12 @@ module MARC2Solr
         # How many of them are there?
         ht_count = fields.size
         
+#puts "HT_COUNT is #{ht_count}"
         # If zero, just set HTSO to false and bail. Nothing to do
         if ht_count == 0
           doc['ht_searchonly'] = false
           doc['ht_searchonly_intl'] = false
+          doc['id'] = nil
           return nil
         end
 
@@ -422,7 +424,7 @@ module MARC2Solr
       def self.fromHTID htids
         Thread.current[:phdbdbh] ||= JDBCHelper::Connection.new(
           :driver=>'com.mysql.jdbc.Driver',
-          :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/mdp_holdings',
+          :url=>'jdbc:mysql://' + MDP_DB_MACHINE + '/mdp_holdings',
           :user => MDP_USER,
           :password => MDP_PASSWORD
         )
