@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 use strict;
 
+my $DATADIR = '/l/solrs/prep/catalog';
+
 use Date::Manip;
 
 my $solrspecfile = $ARGV[0];
@@ -43,20 +45,20 @@ while ($d <= $end) {
     my $ymd = UnixDate($d, '%Y%m%d');
     $d = DateCalc($d, '+ 1 day');
 
-    my $delfile =  "/l/solr-vufind/data/vufind_upd_". $ymd . "_delete.log";
+    my $delfile =  "$DATADIR/vufind_upd_". $ymd . "_delete.log";
     unless (-r $delfile) {
-      $delfile =  "/l/solr-vufind/data/processed/vufind_upd_" . $ymd . "_delete.log";
+      $delfile =  "$DATADIR/processed/vufind_upd_" . $ymd . "_delete.log";
       unless (-r $delfile) {
-	  die "Can't find delete file in ~/data or ~/data/processed: $delfile";
+	  die "Can't find delete file in $DATADIR/ or $DATADIR/processed: $delfile";
       }
     }
     print "Found delete file: $delfile\n";
   
-    my $marcfile =  "/l/solr-vufind/data/vufind_upd_" . $ymd . ".seq";
+    my $marcfile =  "$DATADIR/vufind_upd_" . $ymd . ".seq";
     unless (-r $marcfile) {
-      $marcfile =  "/l/solr-vufind/data/processed/vufind_upd_" . $ymd . ".seq";
+      $marcfile =  "$DATADIR/processed/vufind_upd_" . $ymd . ".seq";
       unless (-r $marcfile) {
-	  die "Can't find delete fmarc ~/data or ~/data/processed: $marcfile";
+	  die "Can't find delete fmarc $DATADIR or $DATADIR/processed: $marcfile";
       }
     }
 
@@ -65,7 +67,7 @@ while ($d <= $end) {
     print "Deleting $ymd\n";
     `marc2solr delete -c $solrspecfile --skipcommit $delfile`;
     print "Indexing $ymd\n";
-    `marc2solr index -c $solrspecfile -c umich.m2s --skipcommit --threads 3 $marcfile`;
+    `marc2solr index -c $solrspecfile -c ht.m2s --skipcommit --threads 3 $marcfile`;
 }
 
 print "Committing...\n";
