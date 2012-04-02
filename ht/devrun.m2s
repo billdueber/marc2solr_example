@@ -1,3 +1,3 @@
-threads 3
-logbatchsize 10000
-sussthreads 3
+threads 5
+logbatchsize 20000
+sussthreads 5
