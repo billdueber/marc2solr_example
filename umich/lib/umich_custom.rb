@@ -384,6 +384,13 @@ module MARC2Solr
 
       ############################################################
       # Get record-level boolean for whether or not this is HTSO
+      # 
+      # Currently broken for stuff that is missing/whatever --
+      # stuff with no actual items but that include an 852,
+      # because they still have an 852 with, say, 'HATCH' in it
+      # even though the item is no longer there. Should probably
+      # suppress the holdings record for that item in Aleph
+      # so it doesn't get exported with an 852.
       ###########################################################
       def self.record_level_htso r
         # Check to see if we have an online or circ holding
