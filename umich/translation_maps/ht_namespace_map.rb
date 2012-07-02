@@ -31,4 +31,6 @@
    "pur2"=>"Purdue University",
    "mdl"=>"Minnesota Digital Library",
    "usu"=>"Utah State University Press",
-   "gri"=>"Getty Research Institute"}}
+   "gri"=>"Getty Research Institute",
+   "uiug"=>"University of Illinois",
+   "psia"=>"Penn State University"}}
