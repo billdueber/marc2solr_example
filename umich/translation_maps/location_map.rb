@@ -6,11 +6,16 @@
  [/^SPEC RCLC/, "SPEC CHIL"],
  [/^SPEC GOSL/, "SPEC CHIL"],
  [/^SPEC CHIL.*/, "SPEC CHIL"],
- [/^SPEC LA.*/, "SPEC LABD"],
- [/^SPEC MYR.*/, "SPEC MYERS"],
+ [/^SPEC WALP.*/, "SPEC CHIL"],
  [/^SPEC FAUL.*/, "SPEC FAUL"],
+ [/^SPEC RAR.*/, "SPEC RARE"],
  [/^SPEC SCI$/, "SPEC RARE"],
  [/^SPEC$/, "SPEC RARE"],
+ [/^SPEC TAUB.*/, "SPEC TAUB"],
+ [/^SPEC LA.*/, "SPEC LABD"],
+ [/^SPEC MYR.*/, "SPEC MYERS"],
+ [/^SPEC WALP.*/, "SPEC WALP"],
+ [/^SPEC WLPR/, "SPEC WALP"],
  [/^HATCH SEM/, "HATCH NER"],
  [/^HATCH MSHLV/, "HATCH BKS"],
  [/^HATCH MREF/, "HATCH BKS"],
@@ -49,8 +54,6 @@
  [/^FLINT FSPAM/, "FLINT MAIN"],
  [/^FLINT BUSP/, "FLINT PERI"],
  [/^FLINT BUSB/, "FLINT MAIN"],
- [/^FLINT ATLAS/, "FLINT REF"],
- [/^SPEC WALP.*/, "SPEC WALP"],
- [/^SPEC WALP.*/, "SPEC CHIL"]]
+ [/^FLINT ATLAS/, "FLINT REF"]]
 
 }

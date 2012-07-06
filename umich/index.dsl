@@ -26,8 +26,8 @@ TMAPS = self.tmaps
 
 
 field('id') do
-  firstOnly
-  spec('001')
+ firstOnly
+ spec('001')
 end
 
 custom('fullrecord') do
@@ -502,10 +502,10 @@ end
 # directly manipulating the doc
 
 custom('ht_id') do
-  function(:fillHathi) {
-    mod mcu
-    args TMAPS
-  }
+ function(:fillHathi) {
+   mod mcu
+   args TMAPS
+ }
 end
 
 
