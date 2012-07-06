@@ -364,15 +364,15 @@ module MARC2Solr
 
         # Add in the print database holdings
 
-        # heldby = []
-        # holdings = self.fromHTID(htids)
-        # holdings.each do |a|
-        #   htid, inst = *a
-        #   heldby << inst
-        #   jsonindex[htid]['heldby'] << inst
-        # end
-        # 
-        # doc['ht_heldby'] = heldby.uniq
+         heldby = []
+         holdings = self.fromHTID(htids)
+         holdings.each do |a|
+           htid, inst = *a
+           heldby << inst
+           jsonindex[htid]['heldby'] << inst
+         end
+         
+         doc['ht_heldby'] = heldby.uniq
 
         # Sort and JSONify the json structure
 
