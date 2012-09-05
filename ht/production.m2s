@@ -1,4 +1,4 @@
-machine "solr-sdr-dev"
+machine "solr-sdr-build-catalog"
 solrpath "catalog"
 port "9033"
 javabin true
