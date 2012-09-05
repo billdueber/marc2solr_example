@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 
+
 my $DATADIR = '/l/solrs/prep/catalog';
 
 use Date::Manip;
@@ -67,7 +68,7 @@ while ($d <= $end) {
     print "Deleting $ymd\n";
     `marc2solr delete -c $solrspecfile --skipcommit $delfile`;
     print "Indexing $ymd\n";
-    `marc2solr index -c $solrspecfile -c ht.m2s --skipcommit --threads 3 $marcfile`;
+    `marc2solr index -c $solrspecfile -c ht.m2s --skipcommit --threads 1 --sussthreads 1 $marcfile`;
 }
 
 print "Committing...\n";
