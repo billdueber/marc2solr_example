@@ -187,6 +187,9 @@ field('author') do
   spec("100abcd")
   spec("110abcd")
   spec("111abc")
+  spec("700abcd")
+  spec("710abcd")
+  spec("711abc")
 end
 
 field('author2') do
@@ -291,6 +294,7 @@ end
 field('title_top') do
   spec("240adfghklmnoprs0")
   spec("245abfghknps")
+  spec("247abfghknps")
   spec("111acdefgjklnpqtu04")
   spec("130adfghklmnoprst0")
 end
