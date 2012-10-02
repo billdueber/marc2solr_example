@@ -56,7 +56,10 @@ while ($d <= $end) {
     unless (-r $marcfile) {
       $marcfile =  "/l/solr-vufind/data/processed/vufind_upd_" . $ymd . ".seq";
       unless (-r $marcfile) {
+        $marcfile = "/l/solr-vufind/data/processed/vufind_upd_" . $ymd . ".seq.gz";
+        unless (-r $marcfile) {
 	  die "Can't find delete fmarc ~/data or ~/data/processed: $marcfile";
+        }
       }
     }
 
