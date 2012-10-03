@@ -3,6 +3,7 @@
  :mapname=>"location_map",
  :map => [
  [/^(.*)/, Proc.new {|m| m[1]}],
+ [/^SPEC AMS.*/, "SPEC AMS"],
  [/^SPEC RCLC/, "SPEC CHIL"],
  [/^SPEC GOSL/, "SPEC CHIL"],
  [/^SPEC CHIL.*/, "SPEC CHIL"],
