@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+use strict;
+
+
+my $rvm_path = "/l/solrs/bin/rvm";
+$ENV{rvm_path} = $rvm_path;
+
+my $DATADIR = '/l/solrs/prep/catalog';
+
+use Date::Manip;
+
+my $solrspecfile = $ARGV[0];
+my $startMD =  UnixDate(ParseDate('today'), '%m%d');
+my $endMD = UnixDate(ParseDate('today'), '%m%d');
+
+
+
+my $year = $ARGV[3] ||  UnixDate(ParseDate('today'), '%Y');
+
+my $start = ParseDate($year . $startMD);
+my $end   = ParseDate($year . $endMD);
+
+
+print "Catching up from ", UnixDate($start, '%Y-%m-%d'), " to ", UnixDate($end, '%Y-%m-%d'), "\n";
+
+unless (-r $solrspecfile and $startMD =~ /^\d{4}$/ and $endMD =~ /^\d{4}$/) {
+    print q{
+
+  catchup -- apply a batch of nightly updates (delete and insert) to a solr instance
+
+    catchup <machinespec.m2s> <start MMDD> <end MMDD>
+
+  Examples:
+  
+    catchup production.m2s 1211 1211 # apply one day to production
+    catchup dev.m2s 1215 1217 # apply three days to dev
+
+  Notes:
+
+    The year is assumed to be whatever the current year is.
+    Files are looked for both in ~/data and ~/data/processing/
+
+};
+
+    exit(1);
+}  
+
+
+my $d = $start;
+while ($d <= $end) {
+    my $ymd = UnixDate($d, '%Y%m%d');
+    $d = DateCalc($d, '+ 1 day');
+
+    my $delfile =  "$DATADIR/vufind_upd_". $ymd . "_delete.log";
+    unless (-r $delfile) {
+      $delfile =  "$DATADIR/processed/vufind_upd_" . $ymd . "_delete.log";
+      unless (-r $delfile) {
+	  die "Can't find delete file in $DATADIR/ or $DATADIR/processed: $delfile";
+      }
+    }
+    print "Found delete file: $delfile\n";
+  
+    my $marcfile =  "$DATADIR/vufind_upd_" . $ymd . ".seq";
+    unless (-r $marcfile) {
+      $marcfile =  "$DATADIR/processed/vufind_upd_" . $ymd . ".seq";
+      unless (-r $marcfile) {
+	  die "Can't find delete fmarc $DATADIR or $DATADIR/processed: $marcfile";
+      }
+    }
+
+    print "Found seq file: $marcfile\n";
+
+    print "Deleting $ymd\n";
+    system("source $rvm_path/scripts/rvm && rvm jruby && marc2solr delete -c $solrspecfile --skipcommit $delfile");
+    print "Indexing $ymd\n";
+    system("source $rvm_path/scripts/rvm && rvm jruby && marc2solr index -c $solrspecfile -c ht.m2s --threads 1 --sussthreads 1 --skipcommit $marcfile");
+}
+
+print "Committing...\n";
+`marc2solr commit -c $solrspecfile`;
+print "Committed. Finished.\n\n";

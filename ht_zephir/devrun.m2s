@@ -1,0 +1,3 @@
+threads 2
+logbatchsize 20000
+sussthreads 2
