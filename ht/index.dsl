@@ -1,5 +1,5 @@
 require 'marc2solr/marc2solr_custom'
-############################### 
+###############################
 ######## HELPERS ##############
 ###############################
 
@@ -161,6 +161,9 @@ field('author') do
   spec("100abcd")
   spec("110abcd")
   spec("111abc")
+  spec("700abcd")
+  spec("710abcd")
+  spec("711abc")
 end
 
 field('author2') do
@@ -252,7 +255,7 @@ custom('title_c') do
 end
 
 
-# titleSort is the same as title_ab, but with the transform in 
+# titleSort is the same as title_ab, but with the transform in
 # getTitleSortable applied
 
 custom('titleSort') do
@@ -260,11 +263,12 @@ custom('titleSort') do
     mod mcu
     args ['a', 'k', 'b']
   }
-end  
+end
 
 field('title_top') do
   spec("240adfghklmnoprs0")
   spec("245abfghknps")
+  spec("247abfghknps")
   spec("111acdefgjklnpqtu04")
   spec("130adfghklmnoprst0")
 end
@@ -469,7 +473,7 @@ end
 #
 # The HT stuff has gotten ridiculously complex
 # Needs refactoring in a big way. How many times am I going to
-# find the 974s? 
+# find the 974s?
 #
 # Sadly, I can't do it *all* with side effects because the syntax demands that
 # something actually get set. So, we'll set ht_id, and do everything else by
