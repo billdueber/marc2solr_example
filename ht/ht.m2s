@@ -1,5 +1,5 @@
 #htdir = "/Users/dueberb/devel/ruby/jruby/marc2solr_example/ht"
-htdir = "/l/solrs/bin/marc2solr_example/ht"
+htdir = "/htsolr/catalog/bin/marc2solr_example/ht"
 indexfile "#{htdir}/index.dsl"
 tmapdir "#{htdir}/translation_maps"
 customdir "#{htdir}/lib"
