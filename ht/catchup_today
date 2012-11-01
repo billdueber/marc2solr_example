@@ -2,10 +2,10 @@
 use strict;
 
 
-my $rvm_path = "/l/solrs/bin/rvm";
+my $rvm_path = "/htsolr/catalog/bin/rvm";
 $ENV{rvm_path} = $rvm_path;
 
-my $DATADIR = '/l/solrs/prep/catalog';
+my $DATADIR = '/htsolr/catalog/prep';
 
 use Date::Manip;
 

@@ -2,7 +2,7 @@
 use strict;
 
 
-my $DATADIR = '/l/solrs/prep/catalog';
+my $DATADIR = '/htsolr/catalog/prep';
 
 use Date::Manip;
 
@@ -59,7 +59,7 @@ while ($d <= $end) {
     unless (-r $marcfile) {
       $marcfile =  "$DATADIR/processed/vufind_upd_" . $ymd . ".seq";
       unless (-r $marcfile) {
-	  die "Can't find delete fmarc $DATADIR or $DATADIR/processed: $marcfile";
+	  die "Can't find marcfile in $DATADIR or $DATADIR/processed: $marcfile";
       }
     }
 
