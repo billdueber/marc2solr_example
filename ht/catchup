@@ -46,18 +46,18 @@ while ($d <= $end) {
     my $ymd = UnixDate($d, '%Y%m%d');
     $d = DateCalc($d, '+ 1 day');
 
-    my $delfile =  "$DATADIR/vufind_upd_". $ymd . "_delete.log";
+    my $delfile =  "$DATADIR/hathi_upd_". $ymd . "_delete.log";
     unless (-r $delfile) {
-      $delfile =  "$DATADIR/processed/vufind_upd_" . $ymd . "_delete.log";
+      $delfile =  "$DATADIR/processed/hathi_upd_" . $ymd . "_delete.log";
       unless (-r $delfile) {
 	  die "Can't find delete file in $DATADIR/ or $DATADIR/processed: $delfile";
       }
     }
     print "Found delete file: $delfile\n";
   
-    my $marcfile =  "$DATADIR/vufind_upd_" . $ymd . ".seq";
+    my $marcfile =  "$DATADIR/hathi_upd_" . $ymd . ".seq";
     unless (-r $marcfile) {
-      $marcfile =  "$DATADIR/processed/vufind_upd_" . $ymd . ".seq";
+      $marcfile =  "$DATADIR/processed/hathi_upd_" . $ymd . ".seq";
       unless (-r $marcfile) {
 	  die "Can't find marcfile in $DATADIR or $DATADIR/processed: $marcfile";
       }
