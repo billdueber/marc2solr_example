@@ -157,6 +157,12 @@ end
 ######### AUTHOR FIELDS ########
 ################################
 
+field('mainauthor') do
+  spec("100abcd")
+  spec("110abcd")
+  spec("111abc")
+end
+
 field('author') do
   spec("100abcd")
   spec("110abcd")
