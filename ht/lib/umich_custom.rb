@@ -341,10 +341,23 @@ module MARC2Solr
           htso_intl = false if intl_avail == 'Full Text'
         end
 
+
         # Done processing the items. Add aggreage info
+
+        # If we've got nothing in ht_rightscode but 'nobody', we
+        # need to mark it as a tombstone.
+
+        rights.uniq!    #make uniq
+        rights.compact! #remove nil
+      
+        if rights.size == 1 && rights[0] == 'nobody'
+          rights << 'tombstone'
+        end
+
+
         doc.add 'ht_availability',  avail[:us].uniq
         doc.add 'ht_availability_intl', avail[:intl].uniq
-        doc.add 'ht_rightscode', rights.uniq
+        doc.add 'ht_rightscode', rights
         doc.add 'htsource', sources.uniq
 
 
