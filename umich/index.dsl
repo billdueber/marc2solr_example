@@ -481,6 +481,7 @@ end
 
 field('publisher') do
   spec("260b")
+  spec("264b")
   spec("533c")
 end
 
