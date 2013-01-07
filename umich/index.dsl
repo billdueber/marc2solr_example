@@ -254,7 +254,7 @@ end
 custom('title') do
   function(:getTitle) {
     mod mcu
-    args 'abdefghknp'.split(//)
+    args 'abdefgknp'.split(//)
   }
 end
 
@@ -275,7 +275,7 @@ end
 custom('vtitle') do
   function(:getTitle) {
     mod mcu
-    args 'abdefghknp'.split(//), false, 2 # don't strip, use the second title only
+    args 'abdefgknp'.split(//), false, 2 # don't strip, use the second title only
   }
 end
 
@@ -298,25 +298,25 @@ custom('titleSort') do
 end
 
 field('title_top') do
-  spec("240adfghklmnoprs0")
-  spec("245abfghknps")
-  spec("247abfghknps")
+  spec("240adfgklmnoprs0")
+  spec("245abfgknps")
+  spec("247abfgknps")
   spec("111acdefgjklnpqtu04")
-  spec("130adfghklmnoprst0")
+  spec("130adfgklmnoprst0")
 end
 
 field('title_rest') do
   spec("210ab")
   spec("222ab")
   spec("242abhnpy")
-  spec("243adfghklmnoprs")
+  spec("243adfgklmnoprs")
   spec("246abdenp")
   spec("247abdenp")
-  spec("700fghjklmnoprstx03")
-  spec("710fghklmnoprstx03")
-  spec("711acdefghjklnpqstux034")
-  spec("730adfghklmnoprstx03")
-  spec("740ahnp")
+  spec("700fgjklmnoprstx03")
+  spec("710fgklmnoprstx03")
+  spec("711acdefgjklnpqstux034")
+  spec("730adfgklmnoprstx03")
+  spec("740anp")
   spec("765st")
   spec("767st")
   spec("770st")
@@ -329,7 +329,7 @@ field('title_rest') do
   spec("785st")
   spec("786st")
   spec("787st")
-  spec("830adfghklmnoprstv")
+  spec("830adfgklmnoprstv")
   spec("440anpvx")
   spec("490avx")
   spec("505t")
