@@ -422,13 +422,14 @@ module MARC2Solr
       # Log in
 
       @htidsnippet = "
-        select volume_id, member_id from htitem_htmember_jn
+        select volume_id, member_id from holdings_htitem_htmember
         where volume_id "
 
       def self.fromHTID htids
         Thread.current[:phdbdbh] ||= JDBCHelper::Connection.new(
           :driver=>'com.mysql.jdbc.Driver',
-          :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/mdp_holdings',
+#          :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/mdp_holdings',
+          :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/ht',
           :user => MDP_USER,
           :password => MDP_PASSWORD
         )
