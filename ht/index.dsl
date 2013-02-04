@@ -23,12 +23,12 @@ TMAPS = self.tmaps
 ###### CORE FIELDS #############
 ################################
 
-
-
-field('id') do
-  firstOnly
-  spec('001')
+custom('id') do
+  function(:massage_record_and_return_id)  {
+    mod MARC2Solr::Custom::MassageRecord
+  }
 end
+
 
 custom('fullrecord') do
   function(:asXML) {
