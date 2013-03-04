@@ -26,7 +26,6 @@ module MARC2Solr
           next unless m
 
           df.tag = m[1]
-          puts "Dealt with #{sf}"
           df.remove_subfield(sf)
         end
 
