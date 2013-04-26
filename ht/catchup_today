@@ -2,13 +2,18 @@
 use strict;
 
 
+my $rvm_path = "/htsolr/catalog/bin/rvm";
+$ENV{rvm_path} = $rvm_path;
+
 my $DATADIR = '/htsolr/catalog/prep';
 
 use Date::Manip;
 
 my $solrspecfile = $ARGV[0];
-my $startMD = $ARGV[1];
-my $endMD = $ARGV[2];
+my $startMD =  UnixDate(ParseDate('today'), '%m%d');
+my $endMD = UnixDate(ParseDate('today'), '%m%d');
+
+
 
 my $year = $ARGV[3] ||  UnixDate(ParseDate('today'), '%Y');
 
@@ -59,16 +64,16 @@ while ($d <= $end) {
     unless (-r $marcfile) {
       $marcfile =  "$DATADIR/processed/hathi_upd_" . $ymd . ".seq";
       unless (-r $marcfile) {
-	  die "Can't find marcfile in $DATADIR or $DATADIR/processed: $marcfile";
+	  die "Can't find marc file in $DATADIR or $DATADIR/processed: $marcfile";
       }
     }
 
     print "Found seq file: $marcfile\n";
 
     print "Deleting $ymd\n";
-    `marc2solr delete -c $solrspecfile --skipcommit $delfile`;
+    system("source $rvm_path/scripts/rvm && rvm jruby && marc2solr delete -c $solrspecfile --skipcommit $delfile");
     print "Indexing $ymd\n";
-    `marc2solr index -c $solrspecfile -c ht.m2s --skipcommit --threads 1 --sussthreads 1 $marcfile`;
+    system("source $rvm_path/scripts/rvm && rvm jruby && marc2solr index -c $solrspecfile -c ht.m2s --threads 1 --sussthreads 1 --skipcommit $marcfile");
 }
 
 print "Committing...\n";

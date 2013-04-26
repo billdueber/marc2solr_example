@@ -8,7 +8,7 @@
       [/world$/, "Full text"],       # matches world, ic-world, und-world
       [/^nobody$/, "Search only"],
       [/^und$/, "Search only"],
-      [/^opb?$/, "Full text"],
+      [/^opb$/, "Full text"],
 
       [/^cc.*/, "Full text"],
 

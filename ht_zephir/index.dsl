@@ -24,17 +24,27 @@ TMAPS = self.tmaps
 ################################
 
 
+# Start off by getting the MARC-XML before we start messing with it
 
-field('id') do
-  firstOnly
-  spec('001')
-end
 
 custom('fullrecord') do
   function(:asXML) {
     mod mc
   }
 end
+
+# Now call "de880_and_return_id" to turn the 880s into
+# non-880 fields and return the id.
+#
+# yes, this is dumb, but I don't have a way to do pure side-effects
+
+custom('id') do
+  function(:massage_record_and_return_id)  {
+    mod MARC2Solr::Custom::MassageRecord
+  }
+end
+
+# Get everything for the keyword index
 
 custom('allfields') do
   function(:getAllSearchableFields) {
@@ -43,6 +53,7 @@ custom('allfields') do
   }
 end
 
+##############################
 ######## Local Data ##########
 
 field("format") do
@@ -73,7 +84,7 @@ end
 custom('oclc') do
   function(:valsByPattern) {
     mod mc
-    args '035', ['a', 'z'], /(?:oclc|ocolc|ocm|ocn).*?(\d+)/i, 1
+    args '035', ['a', 'z'], /(?:oclc|ocolc|ocm|ocn|on).*?(\d+)/i, 1
   }
 end
 
@@ -156,12 +167,6 @@ end
 ################################
 ######### AUTHOR FIELDS ########
 ################################
-
-field('mainauthor') do
-  spec("100abcd")
-  spec("110abcd")
-  spec("111abc")
-end
 
 field('author') do
   spec("100abcd")

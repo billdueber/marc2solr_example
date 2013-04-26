@@ -18,30 +18,30 @@ module MARC2Solr
       # Create a marc spec for SerialTitleRest
 
       SerialTitleRestFieldsSpec = MARCSpec::SolrFieldSpec.fromHash(
-        {
-        :solrField => 'serialTitleRest_internal',
-        :specs => [
-          ['130', 'adfgklmnoprst'],
-          ["210", "ab"],
-          ["222", "ab"],
-          ["240", "adfgklmnprs"],
-          ["246", "abdenp"],
-          ["247", "abdenp"],
-          ["730", "anp"],
-          ["740", "anp"],
-          ["765", "st"],
-          ["767", "st"],
-          ["770", "st"],
-          ["772", "st"],
-          ["775", "st"],
-          ["776", "st"],
-          ["777", "st"],
-          ["780", "st"],
-          ["785", "st"],
-          ["786", "st"],
-          ["787", "st"]
-        ]
-      })
+          {
+              :solrField => 'serialTitleRest_internal',
+              :specs => [
+                  ['130', 'adfgklmnoprst'],
+                  ["210", "ab"],
+                  ["222", "ab"],
+                  ["240", "adfgklmnprs"],
+                  ["246", "abdenp"],
+                  ["247", "abdenp"],
+                  ["730", "anp"],
+                  ["740", "anp"],
+                  ["765", "st"],
+                  ["767", "st"],
+                  ["770", "st"],
+                  ["772", "st"],
+                  ["775", "st"],
+                  ["776", "st"],
+                  ["777", "st"],
+                  ["780", "st"],
+                  ["785", "st"],
+                  ["786", "st"],
+                  ["787", "st"]
+              ]
+          })
 
 
       # Get the country map and the HT Source map
@@ -54,7 +54,7 @@ module MARC2Solr
         data = []
         return data unless r['008'];
         [r['008'].value[15..17], r['008'].value[17..17]].each do |s|
-          data <<  COPMAP[s.gsub(/[^a-z]/, '')] if s
+          data << COPMAP[s.gsub(/[^a-z]/, '')] if s
         end
         return data.compact
       end
@@ -62,11 +62,11 @@ module MARC2Solr
 
       # Get the language(s)
       def self.getLanguage(doc, r)
-        rawdata  = []
+        rawdata = []
 
         # 008
         if r['008'] and r['008'].value[35..37]
-          rawdata <<  r['008'].value[35..37].downcase
+          rawdata << r['008'].value[35..37].downcase
         end
 
         # 041, subfields adej
@@ -74,7 +74,7 @@ module MARC2Solr
         r.find_by_tag('041').each do |f|
           f.sub_values(codes).each do |v|
             unless v.size.modulo(3) == 0
-    #          puts "getLanguage: #{r['001'].value} Invalid data length #{v.size} in 041. #{f.to_s}"
+              #          puts "getLanguage: #{r['001'].value} Invalid data length #{v.size} in 041. #{f.to_s}"
               next
             end
             v.split(//).each_slice(3) do |c|
@@ -163,25 +163,25 @@ module MARC2Solr
         end
 
         case date.to_i
-        when 1500..1800 then
-          century = date[0..1]
-          return century + '00-' + century + '99'
-        when 1801..2100 then
-          decade = date[0..2]
-          return decade + "0-" + decade + "9";
-        else
-          log.debug "getDateRange: {} invalid date {}", r['001'].value, date
+          when 1500..1800 then
+            century = date[0..1]
+            return century + '00-' + century + '99'
+          when 1801..2100 then
+            decade = date[0..2]
+            return decade + "0-" + decade + "9";
+          else
+            log.debug "getDateRange: {} invalid date {}", r['001'].value, date
         end
       end
 
-      def self.publishDateRange(doc,r)
+      def self.publishDateRange(doc, r)
         pubdate = doc['publishDate']
         return [] unless pubdate and pubdate.size > 0
         return self.getDateRange pubdate[0], r
       end
 
       def self.most_recent_cat_date doc, r
-         return r.find_by_tag('972').map{|sf| sf['c']}.max || nil
+        return r.find_by_tag('972').map { |sf| sf['c'] }.max || nil
       end
 
 
@@ -200,7 +200,7 @@ module MARC2Solr
         return rv
       end
 
-      def self.enumcronSort a,b
+      def self.enumcronSort a, b
         matcha = /(\d{4})/.match a['enumcron']
         matchb = /(\d{4})/.match b['enumcron']
         if (matcha and matchb)
@@ -229,7 +229,7 @@ module MARC2Solr
           end
         end
 
-        arr.sort! {|a,b| self.enumcronSort(a, b)}
+        arr.sort! { |a, b| self.enumcronSort(a, b) }
         arr.each do |h|
           h.delete(:sortstring)
         end
@@ -251,9 +251,9 @@ module MARC2Solr
 
         # How many of them are there?
         ht_count = fields.size
-        
+
 #puts "HT_COUNT is #{ht_count}"
-        # If zero, just set HTSO to false and bail. Nothing to do
+# If zero, just set HTSO to false and bail. Nothing to do
         if ht_count == 0
           doc['ht_searchonly'] = false
           doc['ht_searchonly_intl'] = false
@@ -265,7 +265,7 @@ module MARC2Solr
         doc['ht_count'] = ht_count
 
         # Start off by assuming that it's HTSO for both us and intl
-        htso      = true
+        htso = true
         htso_intl = true
 
         # Presume no enumchron
@@ -289,7 +289,7 @@ module MARC2Solr
 
           # Set availability based on the rights code
           us_avail = tmaps['availability_map_ht'][rc]
-          intl_avail =  tmaps['availability_map_ht_intl'][rc]
+          intl_avail = tmaps['availability_map_ht_intl'][rc]
           avail[:us] << us_avail
           avail[:intl] << intl_avail
 
@@ -312,10 +312,10 @@ module MARC2Solr
 
           # Start the json rec.
           jsonrec = {
-            'htid' => id,
-            'ingest' => udate,
-            'rights'  => rc,
-            'heldby'   => [] # fill in later
+              'htid' => id,
+              'ingest' => udate,
+              'rights' => rc,
+              'heldby' => [] # fill in later
           }
 
           # enumchron
@@ -341,27 +341,11 @@ module MARC2Solr
           htso_intl = false if intl_avail == 'Full Text'
         end
 
-
         # Done processing the items. Add aggreage info
-
-        # If we've got nothing in ht_rightscode but 'nobody', we
-        # need to mark it as a tombstone.
-
-        rights.uniq!    #make uniq
-        rights.compact! #remove nil
-      
-        if rights.size == 1 && rights[0] == 'nobody'
-          rights << 'tombstone'
-        end
-
-
-        doc.add 'ht_availability',  avail[:us].uniq
+        doc.add 'ht_availability', avail[:us].uniq
         doc.add 'ht_availability_intl', avail[:intl].uniq
-        doc.add 'ht_rightscode', rights
+        doc.add 'ht_rightscode', rights.uniq
         doc.add 'htsource', sources.uniq
-
-
-
 
 
         # Now we need to do record-level
@@ -377,15 +361,15 @@ module MARC2Solr
 
         # Add in the print database holdings
 
-         heldby = []
-         holdings = self.fromHTID(htids)
-         holdings.each do |a|
-           htid, inst = *a
-           heldby << inst
-           jsonindex[htid]['heldby'] << inst
-         end
-         
-         doc['ht_heldby'] = heldby.uniq
+        heldby = []
+        holdings = self.fromHTID(htids)
+        holdings.each do |a|
+          htid, inst = *a
+          heldby << inst
+          jsonindex[htid]['heldby'] << inst
+        end
+
+        doc['ht_heldby'] = heldby.uniq
 
         # Sort and JSONify the json structure
 
@@ -418,9 +402,6 @@ module MARC2Solr
       end
 
 
-
-
-
       ########################################################
       # PRINT HOLDINGS
       ########################################################
@@ -436,10 +417,10 @@ module MARC2Solr
 
       def self.fromHTID htids
         Thread.current[:phdbdbh] ||= JDBCHelper::Connection.new(
-          :driver=>'com.mysql.jdbc.Driver',
-          :url=>'jdbc:mysql://' + MDP_DB_MACHINE + '/mdp_holdings',
-          :user => MDP_USER,
-          :password => MDP_PASSWORD
+            :driver => 'com.mysql.jdbc.Driver',
+            :url => 'jdbc:mysql://' + MDP_DB_MACHINE + '/mdp_holdings',
+            :user => MDP_USER,
+            :password => MDP_PASSWORD
         )
 
         q = @htidsnippet + "IN (#{commaify htids})"
@@ -450,7 +431,7 @@ module MARC2Solr
       # in the values
 
       def self.commaify a
-        return *a.map{|v| "\"#{v}\""}.join(', ')
+        return *a.map { |v| "\"#{v}\"" }.join(', ')
       end
 
 
