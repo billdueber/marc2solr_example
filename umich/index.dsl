@@ -61,6 +61,18 @@ custom("cat_date") do
   }
 end
 
+field("fund") do
+  spec("975a")
+end
+
+field("fund_display") do
+  spec("975") {
+     subs ['a', 'd']
+     separator '-'
+   }
+end
+
+
 #### INSTITUTION / LOCATION ####
 
 field("institution") do
