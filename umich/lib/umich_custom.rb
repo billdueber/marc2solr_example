@@ -429,7 +429,7 @@ module MARC2Solr
         Thread.current[:phdbdbh] ||= JDBCHelper::Connection.new(
           :driver=>'com.mysql.jdbc.Driver',
 #          :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/mdp_holdings',
-          :url=>'jdbc:mysql://mysql-sdr.umdl.umich.edu/ht',
+          :url=>'jdbc:mysql://mysql-sdr/ht',
           :user => MDP_USER,
           :password => MDP_PASSWORD
         )
