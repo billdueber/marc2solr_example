@@ -8,6 +8,7 @@
  [/^HATCH AMIC/, "Hatcher Graduate Asia Library"],
  [/^HATCH CL.*/, "Hatcher Graduate Clark Library"],
  [/^HATCH.*/, "Hatcher Graduate"],
+ [/^HSRS.*/, "Health Sciences Remote Shelving"],
  [/^UMTRI.*/, "Transportation Research Institute Library (UMTRI)"],
  [/^UGL.*/, "Shapiro Undergraduate"],
  [/^TAUB.*/, "Taubman Medical"],

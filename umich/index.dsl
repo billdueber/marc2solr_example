@@ -1,5 +1,5 @@
 
-############################### 
+###############################
 ######## HELPERS ##############
 ###############################
 
@@ -60,6 +60,18 @@ custom("cat_date") do
     mod mcu
   }
 end
+
+field("fund") do
+  spec("975a")
+end
+
+field("fund_display") do
+  spec("975") {
+     subs ['a', 'd']
+     separator '-'
+   }
+end
+
 
 #### INSTITUTION / LOCATION ####
 
@@ -183,10 +195,19 @@ end
 ######### AUTHOR FIELDS ########
 ################################
 
+field('mainauthor') do
+  spec("100abcd")
+  spec("110abcd")
+  spec("111abc")
+end
+
 field('author') do
   spec("100abcd")
   spec("110abcd")
   spec("111abc")
+  spec("700abcd")
+  spec("710abcd")
+  spec("711abc")
 end
 
 field('author2') do
@@ -278,7 +299,7 @@ custom('title_c') do
 end
 
 
-# titleSort is the same as title_ab, but with the transform in 
+# titleSort is the same as title_ab, but with the transform in
 # getTitleSortable applied
 
 custom('titleSort') do
@@ -286,11 +307,12 @@ custom('titleSort') do
     mod mcu
     args ['a', 'k', 'b']
   }
-end  
+end
 
 field('title_top') do
   spec("240adfghklmnoprs0")
   spec("245abfghknps")
+  spec("247abfghknps")
   spec("111acdefgjklnpqtu04")
   spec("130adfghklmnoprst0")
 end
@@ -471,6 +493,7 @@ end
 
 field('publisher') do
   spec("260b")
+  spec("264b")
   spec("533c")
 end
 
@@ -495,7 +518,7 @@ end
 #
 # The HT stuff has gotten ridiculously complex
 # Needs refactoring in a big way. How many times am I going to
-# find the 974s? 
+# find the 974s?
 #
 # Sadly, I can't do it *all* with side effects because the syntax demands that
 # something actually get set. So, we'll set ht_id, and do everything else by
@@ -513,16 +536,16 @@ end
 #   mapname 'availability_map_ht'
 #   spec("974r")
 # end
-# 
+#
 # field('ht_availability_intl') do
 #   mapname 'availability_map_ht_intl'
 #   spec("974r")
 # end
-# 
+#
 # field('ht_rightscode') do
 #   spec("974r")
 # end
-# 
+#
 # custom('htsource') do
 #   mapname 'ht_namespace_map'
 #   function(:valsByPattern) {
@@ -533,14 +556,14 @@ end
 #           1 # return this match variable (everything up to the first period)
 #   }
 # end
-# 
-# 
+#
+#
 # custom(['ht_id_display', 'ht_id_update', 'ht_id', 'ht_json', 'ht_count']) do
 #   function(:getHathiStuff) {
 #     mod mcu
 #   }
 # end
-# 
+#
 # custom('ht_searchonly') do
 #  function(:isJustHathiSearchOnly) {
 #    mod mcu
@@ -554,7 +577,7 @@ end
 #    args 'ht_availability_intl'
 #  }
 # end
-# 
+#
 # custom('ht_heldby') do
 #   function(:getPrintHoldings) {
 #     mod mcu
