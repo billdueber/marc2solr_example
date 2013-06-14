@@ -2,7 +2,6 @@
  :mapname=>"ht_namespace_map",
  :map=>
   {"mdp"=>"University of Michigan",
-   "gwla"=>"University of Michigan",
    "miua"=>"University of Michigan",
    "miun"=>"University of Michigan",
    "wu"=>"University of Wisconsin",
@@ -34,4 +33,5 @@
    "gri"=>"Getty Research Institute",
    "uiug"=>"University of Illinois",
    "psia"=>"Penn State University",
-   "bc"=>"Boston College"}}
+   "bc"=>"Boston College",
+   "ufl1"=>"University of Florida"}}
