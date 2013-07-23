@@ -1,6 +1,6 @@
 
 ###############################
-######## HELPERS ##############
+######## HELPERS ###############
 ###############################
 
 # First, just make a couple variables so I don't have to
