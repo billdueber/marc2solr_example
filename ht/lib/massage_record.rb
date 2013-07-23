@@ -25,6 +25,7 @@ module MARC2Solr
           m = @tagpattern.match(sf.value)
           next unless m
 
+
           df.tag = m[1]
           df.remove_subfield(sf)
         end

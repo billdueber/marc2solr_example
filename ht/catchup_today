@@ -71,9 +71,8 @@ while ($d <= $end) {
     print "Found seq file: $marcfile\n";
 
     print "Deleting $ymd\n";
-    system("source $rvm_path/scripts/rvm && rvm jruby && marc2solr delete -c $solrspecfile --skipcommit $delfile");
     print "Indexing $ymd\n";
-    system("source $rvm_path/scripts/rvm && rvm jruby && marc2solr index -c $solrspecfile -c ht.m2s --threads 1 --sussthreads 1 --skipcommit $marcfile");
+     `./catchup_helper.sh $solrspecfile $delfile $marcfile`
 }
 
 print "Committing...\n";
