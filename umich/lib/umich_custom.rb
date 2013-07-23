@@ -292,8 +292,18 @@ module MARC2Solr
           avail[:us] << us_avail
           avail[:intl] << intl_avail
 
-          # Get the ID. Put it in a local array (htids) because we have to return it
+          # Get the ID and make sure it's lowercase.
+          # Put it in a local array (htids) because we have to return it
           id = f['u']
+          lc_id = id.downcase
+          if id != lc_id
+            log.error "#{id} needs to be lowecase";
+            id = lc_id
+          end
+            
+          
+          
+          
           htids << id
 
           # Extract the source
@@ -433,6 +443,7 @@ module MARC2Solr
           :user => MDP_USER,
           :password => MDP_PASSWORD
         )
+        
 
         q = @htidsnippet + "IN (#{commaify htids})"
         return Thread.current[:phdbdbh].query(q)
