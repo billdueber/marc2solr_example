@@ -1,5 +1,11 @@
 # marc2Solr_example -- example files for marc2solr
 
+----
+
+**Deprecated and archived**. See [traject/traject](https://github.com/traject/traject) for where things ended up.
+
+----
+
 These are just a set of example for how to configure [marc2solr](http://github.com/billdueber/marc2solr), a program to take MARC records, transform them, and send them to Solr.
 
 For easy access, you should probably just clone this repository:
